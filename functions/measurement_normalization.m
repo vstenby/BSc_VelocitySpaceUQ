@@ -3,7 +3,7 @@ function [Shat, What] = measurement_normalization(S, W, s)
 
 if any(size(s) == 1)
     %If s is a vector, it should be made into a diagonal matrix.
-    sinv = 1./diag(s);
+    sinv = inv(diag(s));
 else
     sinv = inv(s);
 end
