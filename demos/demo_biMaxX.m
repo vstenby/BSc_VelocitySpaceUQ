@@ -10,9 +10,11 @@ fprintf('Starting demo_biMaxX:\n\n')
 addpath('../functions')
 addpath(genpath('../../aux'))
 
-%If not specified, biMaxX will have several default windows. These default
+%If not specified, biMaxX will have several default values. These default
 %values are specified in the help command.
 help biMaxX
+
+%Also worth noting - these default values are the same as in biMaxS.
 
 fprintf('1: Dimensions of vpara and vperp\n\n')
 %biMaxX can either be evaluated on (vpara, vperp) with them being vectors
