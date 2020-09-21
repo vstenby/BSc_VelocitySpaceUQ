@@ -2,7 +2,7 @@
 
 ## Introduction 
 
-This code was written for my BSc titled *Uncertainty Quantification for Velocity-Space Tomography* from September 2020 - January 2021. 
+This code was written for my BSc thesis *Uncertainty Quantification for Velocity-Space Tomography*, fall semester 2020.
 
 Author: Viktor Stenby Johansson
 
@@ -22,3 +22,7 @@ In order for the code to work, you will need the following folder structure:
 └── aux
     └── mosek
 ```
+
+## Mosek installation
+
+In order to get Mosek up and running, follow the installation guide here: https://docs.mosek.com/9.2/install/installation.html
