@@ -10,7 +10,7 @@ Supervisors: Per Christian Hansen, Yiqiu Dong, Jakob Sauer Jørgensen and Mirko 
 
 ## Folder structure
 
-In order for the code to work, you'll need the following folder structure:
+In order for the code to work, you will need the following folder structure:
 
 ```bash
 ├── BSc_VelocitySpaceUQ
