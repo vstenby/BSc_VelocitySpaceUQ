@@ -5,6 +5,7 @@ Qe = 1.6021917e-19; %Elementary charge
 
 umin = []; umax = []; du = []; udim = [];
 
+
 if isfield(ustruct,'umin'), umin = ustruct.umin; end
 if isfield(ustruct,'umax'), umax = ustruct.umax; end
 if isfield(ustruct,'udim'), udim = ustruct.udim; end
@@ -20,10 +21,10 @@ end
 
 if ~isempty(udim) && ~isempty(du)
     error('udim and du cannot be specified simultaneously.')
-elseif isempty(umin) && ~isempty(du)
+elseif ~isempty(udim) && ~isempty(du)
     warning('du specified but not used.')
-elseif isempty(umin) && isempty(udim)
-    error('If umin is not specified, then udim should be.')
+elseif isempty(umin) && (isempty(udim) && isempty(du))
+    error('If umin is not specified, then udim or du should be.')
 elseif isempty(umax)
     error('umax/Emax is not specified.')
 elseif isempty(udim) && isempty(du)
@@ -31,8 +32,14 @@ elseif isempty(udim) && isempty(du)
 end
 
 if isempty(umin)
-    %uvec should go from -umax to umax with udim points.
-    uvec = linspace(-umax, umax, udim); 
+    if ~isempty(udim)
+        %uvec should go from -umax to umax with udim points.
+        uvec = linspace(-umax, umax, udim); 
+    elseif ~isempty(du)
+        uvec = -umax:du:umax;
+    else
+        error('Something went wrong.')
+    end
 elseif ~isempty(umin) && ~isempty(du)
     %uvec should look like this
     uvec = [-umax : du : -umin umin : du : umax];

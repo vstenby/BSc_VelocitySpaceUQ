@@ -1,10 +1,14 @@
-function X = biMaxX(vpara, vperp, Tpara, Tperp, vparadrift, options)
-%   DESCRIPTION GOES HERE!
+function [X, info] = biMaxX(vpara, vperp, Tpara, Tperp, vparadrift, options)
+% This function evaluates the drifting bi-Maxwellian.
 %
 %
-%
-%
-%
+% If not specified, these will be the default values:
+% Tpara = 200e3 eV
+% Tperp = 200e3 eV
+% vparadrift = 5e6
+% Mi = 4*(1.6726e-27)
+% ne = 1e19
+
 
 %Physical constants
 Mp = 1.6726e-27;    %Mass of proton
@@ -48,5 +52,17 @@ vthperp=sqrt(2*Tperp*Qe/Mi);
 %Equation 69.
 X = (2*ne*vperp)/(sqrt(pi)*vthpara*vthperp.^2) .* exp(-((vpara-vparadrift)/vthpara).^2-(vperp/vthperp).^2);
 
+if any(size(X) == 1)
+    X = reshape(X, numel(X), 1);
+end
+
+%Saving the relevant parameters to the info structure.
+info.vpara = vpara;
+info.vperp = vperp;
+info.Tpara = Tpara;
+info.Tperp = Tperp;
+info.vparadrift = vparadrift;
+info.Mi = Mi;
+info.ne = ne;
 end
 

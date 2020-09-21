@@ -1,10 +1,18 @@
-function S = biMaxS(u, phi, Tpara, Tperp, vparadrift, options)
-%   DESCRIPTION GOES HERE!
+function [S, info] = biMaxS(u, phi, Tpara, Tperp, vparadrift, options)
+% This function returns the analytical projections of the bi-Maxwellian
+% distribution function.
+%
 % 
-% u   : Either vector of values or structure
-% phi : Vector 
-%
-%
+% If not specified, these will be the default values:
+% Tpara = 200e3 eV
+% Tperp = 200e3 eV
+% vparadrift = 5e6
+% Mi = 4*(1.6726e-27)
+% ne = 1e19
+
+%Physical constants
+Mp = 1.6726e-27;    %Mass of proton
+Qe = 1.6021917e-19; %Elementary charge
 
 %A bit of code duplication, perhaps ask Jakob how to do this better.
 if nargin == 2
@@ -33,9 +41,13 @@ else
     error('Wrong number of inputs')
 end
 
+%Fetching other parameters from options.
+ne = options.ne;
+Mi = options.Mi;
+
 %Make sure we get u as specified.
 if isstruct(u)
-    uvec = construct_uvec(ustruct);
+    uvec = construct_uvec(u, Mi);
 else
     %Assume u is a vector.
     uvec = u;
@@ -57,33 +69,18 @@ for i = 1:length(phivec)
     %u_d is specified in Equation 73 but written inline here.
     S(idx1 : idx2) = ne*(Mi/(2*pi*Teff*Qe))^0.5*exp(-(Mi*(uvec-vparadrift*cos(phi/180*pi)).^2)/(2*Teff*Qe)); %Equation (72)
 end
-end
 
-%Auxil function to construct uvec.
-function uvec = construct_uvec(ustruct)
-umin = []; umax = []; du = []; udim = [];
+%Return S as a column vector.
+S = S'; 
 
-if isfield(ustruct,'umin'), umin = ustruct.umin; end
-if isfield(ustruct,'umax'), umax = ustruct.umax; end
-if isfield(ustruct,'udim'), udim = ustruct.udim; end
-if isfield(ustruct,'du'), du = ustruct.du; end
-
-if ~isempty(udim) && ~isempty(du)
-    error('udim and du cannot be specified simultaneously.')
-elseif isempty(umin) && ~isempty(du)
-    warning('du specified but not used.')
-elseif isempty(umin) && isempty(udim)
-    error('If umin is not specified, then udim should be.')
-elseif isempty(umax)
-    error('umax not specified')
-end
-
-if isempty(umin)
-    %uvec should go from -umax to umax with udim points.
-    uvec = linspace(-umax, umax, udim); 
-elseif ~isempty(umin) && ~isempty(du)
-    %uvec should look like this
-    uvec = [-umax : du : -umin umin : du : umax];
-end
+%Saving the relevant parameters to the info structure.
+info.u = uvec;
+info.du = info.u(2)-info.u(1);
+info.phi = phivec;
+info.Tpara = Tpara;
+info.Tperp = Tperp;
+info.vparadrift = vparadrift;
+info.Mi = Mi;
+info.ne = ne;
 
 end

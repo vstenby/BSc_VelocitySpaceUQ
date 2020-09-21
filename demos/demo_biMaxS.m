@@ -4,7 +4,7 @@
 
 clear, clc, close all
 
-fprintf('Starting demo_biMaxX:\n\n')
+fprintf('Starting demo_biMaxS:\n\n')
 
 %Add dependencies.
 addpath('../functions')

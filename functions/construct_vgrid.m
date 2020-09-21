@@ -1,6 +1,16 @@
 function [vpara, vperp, gridinfo] = construct_vgrid(vparamin, vparamax, vparadim, vperpmin, vperpmax, vperpdim)
 %Construct VPERP and VPARA which are either vectors or matrices.
 
+if nargin == 0
+    %Default values for construct_vgrid();
+    vparamin = -1.4e7;
+    vparamax = 1.4e7;
+    vparadim = 100;
+    vperpmin = 1e5;
+    vperpmax = 1.4e7;
+    vperpdim = 50;
+end
+
 vpara_linspace = linspace(vparamin, vparamax, vparadim);
 vperp_linspace = linspace(vperpmin, vperpmax, vperpdim);
 

@@ -1,5 +1,8 @@
 function [X, S, A] = biMax(vpara, vperp, Tpara, Tperp, vparadrift, phivec, ...
-                           umin, umax, udim, ubroadening)         
+                           umin, umax, udim, ubroadening) 
+%
+% Phased-out
+                      
 %   This function calculates the analytic density function X, 
 %   the analytic projection S, and the forward model matrix A, such that
 %   A*X(:) is the numeric projection S.
