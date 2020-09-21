@@ -2,7 +2,7 @@
 
 ## Introduction 
 
-This code was written for my BSc titled *Uncertainty Quantification for Velocity-Space Tomography* from September 2020 - January 2021. 
+This code was written for my BSc titled *Uncertainty Quantification for Velocity-Space Tomography*, fall semester 2020.
 
 Author: Viktor Stenby Johansson
 
