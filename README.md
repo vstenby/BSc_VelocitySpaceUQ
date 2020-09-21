@@ -15,8 +15,9 @@ In order for the code to work, you will need the following folder structure:
 ```bash
 ├── BSc_VelocitySpaceUQ
 │   ├── README.md
-│   ├── demos
 │   ├── functions
+│   ├── demos
+│   ├── testprobs
 │   └── other
 │       └── tomoanalyticV
 └── aux
