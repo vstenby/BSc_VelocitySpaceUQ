@@ -22,3 +22,7 @@ In order for the code to work, you will need the following folder structure:
 └── aux
     └── mosek
 ```
+
+## Mosek installation
+
+In order to get Mosek up and running, follow the installation guide here: https://docs.mosek.com/9.2/install/installation.html
