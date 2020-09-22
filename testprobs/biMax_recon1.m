@@ -31,7 +31,7 @@ S_noisy = add_noise(S,0.01);
 A = biMaxA(3,biMaxXinfo,biMaxSinfo);
 
 %Reconstruct using given alpha-value.
-alpha = 2e8;
+alpha = 2.8e8;
 X_recon = mosek_TikhNN(A, S_noisy, alpha);
 
 %Display the distribution

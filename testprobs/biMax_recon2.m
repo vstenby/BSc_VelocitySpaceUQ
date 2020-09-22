@@ -38,7 +38,7 @@ A = biMaxA(3,biMaxXinfo,biMaxSinfo);
 [S2hat, A2hat, factor] = numeric_normalization(Shat, Ahat);
 
 %Reconstruct using given alpha-value.
-alpha = 4.9417e-15;
+alpha = 3.4e-16;
 X_recon = mosek_TikhNN(A2hat, S2hat, alpha);
 
 %Display the distribution
