@@ -32,7 +32,7 @@ phi=[10 20 40 70 85];
 A = biMaxA(3,biMaxXinfo,biMaxSinfo);
 
 %Normalize by the measurement uncertainty
-[Shat, Ahat] = measurement_normalization(S,A,s);
+[Shat, Ahat] = measurement_normalization(S_noisy,A,s);
 
 %Normalize with the 2-norm
 [S2hat, A2hat, factor] = numeric_normalization(Shat, Ahat);
