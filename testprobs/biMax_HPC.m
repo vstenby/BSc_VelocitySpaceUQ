@@ -5,7 +5,7 @@ while 1
     run('biMax_UQ') 
     n = find_newest_name();
     dataname = strcat('sim',num2str(n),'.mat');
-    save(dataname,'A','S','x_sim','del_sim','lam_sim','alph_sim')
+    save(dataname,'A','S','x_sim','del_sim','lam_sim','alph_sim','gridinfo')
 end
 
 function n = find_newest_name()
