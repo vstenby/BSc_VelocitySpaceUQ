@@ -31,16 +31,36 @@ function [x, Active, iter, Gnrm] = GPCG(A, b, x, MaxIts, MaxGP, MaxCG, tol)
 %
 %
 %  J. Bardsley 12-07-2007, modifications 11-11-2010
-%
-  if ~isnumeric(A), Afun = A.Afun; Aparams=A.Aparams; end
-  if     nargin < 4, MaxIts = 100; MaxGP = 1e8; MaxCG = 1e8; tol = 1e-5;
-  elseif nargin < 5, MaxGP = 1e8; MaxCG = 1e8; tol = 1e-5;
-  elseif nargin < 6, MaxCG = 1e8; tol = 1e-5;
-  elseif nargin < 7, tol = 1e-5; end
-  if isempty(x), x = ones(size(b)); 
-  else x = max(x,0); end
+%  V. Stenby, modifications 24-09-2020
+
+  %if ~isnumeric(A)
+  %    Afun = A.Afun; 
+  %    Aparams=A.Aparams; 
+  %end
   
-  if isnumeric(A), Ax=A*x; else Ax=feval(Afun,x,Aparams); end 
+  if nargin < 4 
+      MaxIts = 100;
+      MaxGP = 1e8; 
+      MaxCG = 1e8; 
+      tol = 1e-5;
+  elseif nargin < 5
+      MaxGP = 1e8; 
+      MaxCG = 1e8; 
+      tol = 1e-5;
+  elseif nargin < 6
+      MaxCG = 1e8; 
+      tol = 1e-5;
+  elseif nargin < 7
+      tol = 1e-5; 
+  end
+  
+  if isempty(x)
+      x = ones(size(b)); 
+  else
+      x = max(x,0); 
+  end
+  
+  Ax=feval(A,x);   
   g = Ax-b;
   J = x(:)'*(.5*Ax(:)-b(:));  % Initial value of the cost function.
   Active = (x == 0);                        % Compute active set
@@ -71,11 +91,15 @@ function [x, Active, iter, Gnrm] = GPCG(A, b, x, MaxIts, MaxGP, MaxCG, tol)
       
       % Compute Cauchy step-length parameter. Then perform linesearch.
       d = -g.*((1 - Active) + Active.*(g < 0));
-      if isnumeric(A), Ad = A*d; 
-      else Ad=feval(Afun,d,Aparams); end 
+      
+      Ad=feval(A,d); 
+      
       init_step_param = -g(:)'*d(:) / (d(:)'*Ad(:));
       [xnew,Jnew,g,ls_paramGP,ls_flag] = linesearch(y,d,g,J,A,b,init_step_param);
-      if ls_flag == 4, disp(' Line search failure. '); return; end
+      if ls_flag == 4
+          disp(' Line search failure. ');
+          return; 
+      end
       
       %  Update information and check GP stopping criteria.
       Active_new = (xnew == 0);
@@ -109,7 +133,7 @@ function [x, Active, iter, Gnrm] = GPCG(A, b, x, MaxIts, MaxGP, MaxCG, tol)
       rd = resid(:)'*d(:); 
       
       %  Compute new conjugate direction p.
-      if cg_iter == 1, 
+      if cg_iter == 1 
           p = d; 
       else
           betak  = rd/rdlast;    
@@ -117,8 +141,8 @@ function [x, Active, iter, Gnrm] = GPCG(A, b, x, MaxIts, MaxGP, MaxCG, tol)
       end
 
       %  Update delx and residual.
-      if isnumeric(A), Ap = A*p; 
-      else Ap = feval(Afun,p,Aparams); end 
+
+      Ap = feval(A,p); 
       Ap  = (1-Active).*Ap;
       alphak  = rd/(p(:)'*Ap(:));
       delx = delx + alphak*p;   
@@ -133,7 +157,10 @@ function [x, Active, iter, Gnrm] = GPCG(A, b, x, MaxIts, MaxGP, MaxCG, tol)
       if J_diff <= .1*J_diff_max | cg_iter == MaxCG
         init_step_param = 1;
         [x,J,g,ls_paramCG,ls_flag] = linesearch(xold,delx,gold,Jold,A,b,init_step_param);
-        if ls_flag == 4, disp(' Line search failure. '); return; end
+        if ls_flag == 4
+            disp(' Line search failure. '); 
+            return; 
+        end
         stepnorm = norm(x(:)-xold(:));
         Active = (x == 0);
         pg = g.*((1 - Active) + Active.*(g < 0));
@@ -199,8 +226,7 @@ function [xnew,Jnew,gnew,alpha,ls_flag] = linesearch(x,p,g,J,A,b,alpha_init)
 %       gnew  -  grad J(xnew)
 %       ls_flag - reason for exiting line search
 %
-  if ~isnumeric(A), Afun = A.Afun; Aparams=A.Aparams; end
-  
+
   ls_flag = 0;
   ls_iter = 0;
   phi_0 = J;
@@ -209,15 +235,15 @@ function [xnew,Jnew,gnew,alpha,ls_flag] = linesearch(x,p,g,J,A,b,alpha_init)
   xnew = x + alpha*p;
   
   if min(xnew(:)>=0)  %  Unconstrained min is in feasible set.
-    if isnumeric(A), Axnew = A*xnew; 
-    else Axnew = feval(Afun,xnew,Aparams); end  
+
+    Axnew = feval(A,xnew);
+
     gnew = Axnew-b;
     Jnew = xnew(:)'*(.5*Axnew(:)-b(:));                   
     return
   else                %  Unconstrained min is not in feasible set.
     xnew = max(xnew,0);
-    if isnumeric(A), Axnew = A*xnew; 
-    else Axnew = feval(Afun,xnew,Aparams); end  
+    Axnew = feval(A,xnew); 
     gnew = Axnew-b;
     phi_alpha = xnew(:)'*(.5*Axnew(:)-b(:));                   
   end    
@@ -249,8 +275,7 @@ function [xnew,Jnew,gnew,alpha,ls_flag] = linesearch(x,p,g,J,A,b,alpha_init)
     alpha = max(m,beta_1);
     % Evaluate phi(alpha).
     xnew = max(x + alpha*p,0);
-    if isnumeric(A), Axnew = A*xnew; 
-    else Axnew = feval(Afun,xnew,Aparams); end  
+    Axnew = feval(A,xnew); 
     gnew = Axnew-b;
     phi_alpha = xnew(:)'*(.5*Axnew(:)-b(:));                   
     if ls_iter >= max_iter
