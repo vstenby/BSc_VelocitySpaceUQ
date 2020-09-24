@@ -10,7 +10,8 @@ end
 
 function n = find_newest_name()
 %Finds the next sim number in the folder.
-sims = {dir('sim*.mat').name};
+sims = dir('sim*.mat');
+sims = {sims.name};
 n = 0;
 for i=1:length(sims)
     temp_str = sims{i};
