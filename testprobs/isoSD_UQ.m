@@ -20,22 +20,20 @@ ustruct.udim = 200;
 phi=[10 20 40 70 85];
 
 [S, isoSDSinfo] = isoSDS(ustruct,phi);
-
-%Because some of the elements in S are negative, this will add complex
-%noise. I will have to ask Mirko about this.
-%S_noisy = add_noise(S,0.01);
+%S_noisy = add_noise(S,0.01); 
+%Some of the elements in S are negative, and therefore the noise will be
+%complex.
 S_noisy = S + 0.05*randn(size(S));
 
+S = S_noisy;
 A = isoSDA(3,isoSDXinfo,isoSDSinfo);
 
+%% UQ on isoSD case.
+alpha = 2.2230e+09; %alpha0 is pretty important and dependent on the noise.
+
+[x_sim, del_sim, lam_sim, alph_sim] = NNHGS_UQ(A,S,alpha,100);
+
 %%
-%Reconstruct using given alpha-value.
-alpha = 2.2230e+09;
-X_recon = mosek_TikhNN(A, S_noisy, alpha);
+showDistribution(std(x_sim,0,2),gridinfo)
 
-figure
-subplot(1,2,1)
-showDistribution(X, gridinfo)
 
-subplot(1,2,2)
-showDistribution(X_recon,gridinfo)

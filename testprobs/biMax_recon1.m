@@ -22,6 +22,7 @@ ustruct.udim = 200;
 %Observation angles
 phi=[10 20 40 70 85];
 
+
 [S, biMaxSinfo] = biMaxS(ustruct,phi);
 S_noisy = add_noise(S,0.01);
 
