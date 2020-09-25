@@ -1,5 +1,4 @@
 function [vpara, vperp, gridinfo] = construct_vgrid(vparamin, vparamax, vparadim, vperpmin, vperpmax, vperpdim)
-%Construct VPERP and VPARA which are either vectors or matrices.
 
 if nargin == 0
     %Default values for construct_vgrid();
