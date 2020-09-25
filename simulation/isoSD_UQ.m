@@ -1,5 +1,16 @@
 clear, clc, close all
 
+%Set the simulation setup.
+simname = 'isoSD_UQ';
+nsim    = 5000; %Number of samples simulated per run.
+disp_waitbar = 1;
+
+if ~isfolder(simname)
+    mkdir(simname)
+else
+    error('Folder already exists')
+end
+
 %Add dependencies.
 addpath('../functions')
 addpath(genpath('../../aux'))
@@ -28,12 +39,19 @@ S_noisy = S + 0.05*randn(size(S));
 S = S_noisy;
 W = isoSDW(3,isoSDFinfo,isoSDSinfo);
 
+save(strcat('./',simname,'/setup.mat'))
+
 %% UQ on isoSD case.
-alpha = 2.2230e+09; %alpha0 is pretty important and dependent on the noise.
 
-[F_sim, del_sim, lam_sim, alph_sim] = NNHGS_UQ(W,S,alpha,100);
 
-%%
-showDistribution(std(F_sim,0,2),gridinfo)
+while 1
+   clearvars -except W S alpha nsim simname disp_waitbar
+   alpha = 2.2230e+09; %alpha0 is pretty important and dependent on the noise.
+   [F_sim, del_sim, lam_sim, alph_sim] = NNHGS_UQ(W,S,alpha,nsim,disp_waitbar);
+   
+   save(strcat('./',simname,'/sim',num2str(nextsimnum(simname)),'.mat'), ...
+        'F_sim','del_sim','lam_sim','alph_sim')
+end
+
 
 
