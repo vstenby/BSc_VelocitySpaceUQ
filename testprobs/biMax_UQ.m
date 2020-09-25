@@ -34,4 +34,4 @@ A = biMaxA(3,biMaxXinfo,biMaxSinfo);
 %% Normalize the problem.
 alpha = 2.8e8;
 
-[x_sim, del_sim, lam_sim, alph_sim] = NNHGS_UQ(A,S,alpha,1000);
+[x_sim, del_sim, lam_sim, alph_sim] = NNHGS_UQ(A,S,alpha,5);

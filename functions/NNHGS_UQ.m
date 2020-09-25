@@ -48,6 +48,7 @@ for i=2:n
    B = @(x) (A' * (A*x)) + alph_sim(i)*x;
    
    xtemp = GPCG(B, c, zeros(N,1), 50, 5, 20, 1e-6);
+   
    x_sim(:,i) = xtemp;
     
 end
