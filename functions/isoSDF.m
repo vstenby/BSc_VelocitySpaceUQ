@@ -1,14 +1,13 @@
-function [X, info] = biMaxX(vpara, vperp, Tpara, Tperp, vparadrift, options)
-% This function evaluates the drifting bi-Maxwellian.
+function [F, info] = isoSDF(vpara, vperp, Ecrit, Ebirth, Ebirthwidth, options)
+% This function evaluates the isotropic slowing-down distribution.
 %
 %
 % If not specified, these will be the default values:
-% Tpara = 200e3 eV
-% Tperp = 200e3 eV
-% vparadrift = 5e6
+% Ecrit=44*20000;  %eV
+% Ebirth=3.5e6; %eV
+% Ebirthwidth=6e4;
 % Mi = 4*(1.6726e-27)
 % ne = 1e19
-
 
 %Physical constants
 Mp = 1.6726e-27;    %Mass of proton
@@ -16,15 +15,13 @@ Qe = 1.6021917e-19; %Elementary charge
 
 %A bit of code duplication, perhaps ask Jakob how to do this better.
 if nargin == 2
-    %Tpara, Tperp, vparadrift and options not given.
-    Tpara=200e3; %eV
-    Tperp=200e3; %eV
-    vparadrift = 5e6; 
-    options.Mi = 4*Mp;
-    options.ne = 1e19;   
+    Ecrit       =44*20000;  %eV
+    Ebirth      = 3.5e6;    %eV
+    Ebirthwidth = 6e4;
+    options.Mi  = 4*Mp;
+    options.ne  = 1e19;   
 elseif nargin == 4
-    %vparadrift and options not given.
-    vparadrift =5e6; 
+    Ebirthwidth=6e4;
     options.Mi = 4*Mp;
     options.ne = 1e19;  
 elseif nargin == 5
@@ -45,24 +42,21 @@ end
 ne = options.ne;
 Mi = options.Mi;
 
-%Thermal velocities
-vthpara=sqrt(2*Tpara*Qe/Mi);
-vthperp=sqrt(2*Tperp*Qe/Mi);
+%slowing-down
+vcrit=sqrt(2*Ecrit*Qe/Mi);
+vbirth=sqrt(2*Ebirth*Qe/Mi);
 
-%Equation 69.
-X = (2*ne*vperp)/(sqrt(pi)*vthpara*vthperp.^2) .* exp(-((vpara-vparadrift)/vthpara).^2-(vperp/vthperp).^2);
-
-if any(size(X) == 1)
-    X = reshape(X, numel(X), 1);
-end
+fvpavpe3DSD=ne*3/(4*pi)/(log(1+(vbirth/vcrit)^3))./((vpara.^2+vperp.^2).^1.5+vcrit^3).*erfc((0.5*Mi*(vpara.^2+vperp.^2)/Qe-Ebirth)/Ebirthwidth)/2;
+F = fvpavpe3DSD.*(2*pi*vperp);
 
 %Saving the relevant parameters to the info structure.
-info.vpara = vpara;
-info.vperp = vperp;
-info.Tpara = Tpara;
-info.Tperp = Tperp;
-info.vparadrift = vparadrift;
-info.Mi = Mi;
-info.ne = ne;
+info.vpara       = vpara;
+info.vperp       = vperp;
+info.Ecrit       = Ecrit;
+info.Ebirth      = Ebirth;
+info.Ebirthwidth = Ebirthwidth;
+info.Mi          = Mi;
+info.ne          = ne;
+
 end
 
