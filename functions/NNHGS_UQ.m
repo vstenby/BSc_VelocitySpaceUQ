@@ -1,5 +1,13 @@
-function [x_sim, del_sim, lam_sim, alph_sim] = NNHGS_UQ(A, b, alpha0, n)
+function [x_sim, del_sim, lam_sim, alph_sim] = NNHGS_UQ(A, b, alpha0, n, disp_waitbar)
 %Nonnegative Hierachical Gibbs Sampler.
+
+if nargin <= 4
+    disp_waitbar = 0;  
+end
+
+if disp_waitbar
+    f = waitbar(1/n,'Finding initial xalpha');
+end
 
 [M,N] = size(A);
 
@@ -28,7 +36,7 @@ t1         = 0.0001;
 Atb = A'*b;
 
 for i=2:n
-   disp(i)
+   if disp_waitbar, waitbar(i/n, f, 'Sampling...'), end
    Axtemp = A*xtemp;
   
    %Note here that 1./ is because of the way MATLAB does gamrnd. 
@@ -52,4 +60,5 @@ for i=2:n
    x_sim(:,i) = xtemp;
     
 end
+if disp_waitbar, close(f), end
 end
