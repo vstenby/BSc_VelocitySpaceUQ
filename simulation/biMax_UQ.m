@@ -9,6 +9,8 @@ disp_waitbar = 1;
 
 if ~isfolder(simname)
     mkdir(simname)
+elseif input('Should simulations be added to the same folder? ') == 1
+    %Nothing should happen.
 else
     error('Folder already exists')
 end

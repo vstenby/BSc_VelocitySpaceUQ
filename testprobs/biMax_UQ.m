@@ -3,7 +3,7 @@
 clear, clc, close all
 
 %Set the simulation setup.
-nsim = 50; 
+nsim = 20; 
 disp_waitbar = 1;
 
 %Add dependencies.
@@ -37,4 +37,5 @@ alpha = 2.8e8; %alpha0
 
 [F_sim, del_sim, lam_sim, alph_sim] = NNHGS_UQ(W,S,alpha,nsim,disp_waitbar);
 
+analyze_sim(nsim, F_sim, alph_sim, del_sim, lam_sim, gridinfo);
 

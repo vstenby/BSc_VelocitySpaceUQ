@@ -3,10 +3,13 @@ clear, clc, close all
 %Set the simulation setup.
 simname = 'isoSD_UQ';
 nsim    = 5000; %Number of samples simulated per run.
+
 disp_waitbar = 1;
 
 if ~isfolder(simname)
     mkdir(simname)
+elseif input('Should simulations be added to the same folder? ') == 1
+    %Nothing should happen.
 else
     error('Folder already exists')
 end
@@ -42,7 +45,6 @@ W = isoSDW(3,isoSDFinfo,isoSDSinfo);
 save(strcat('./',simname,'/setup.mat'))
 
 %% UQ on isoSD case.
-
 
 while 1
    clearvars -except W S alpha nsim simname disp_waitbar
