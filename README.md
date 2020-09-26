@@ -22,6 +22,8 @@ In order for the code to work, you will need the following folder structure:
 │   ├── README.md
 │   ├── functions
 │   ├── demos
+│   ├── simulation
+│   ├── images
 │   ├── testprobs
 │   └── other
 │       └── tomoanalyticV
