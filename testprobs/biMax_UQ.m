@@ -37,17 +37,4 @@ alpha = 2.8e8; %alpha0
 
 [F_sim, del_sim, lam_sim, alph_sim] = NNHGS_UQ(W,S,alpha,nsim,disp_waitbar);
 
-%%
-
-nburnin = floor(0.1*nsim);
-
-figure
-sgtitle('Histograms of delta, lambda and alpha')
-subplot(1,3,1)
-hist(del_sim(nburnin+1:end)); axis square
-subplot(1,3,2)
-hist(lam_sim(nburnin+1:end)); axis square
-subplot(1,3,3)
-hist(alph_sim(nburnin+1:end)); axis square
-
 
