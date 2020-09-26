@@ -12,7 +12,7 @@ else
 end
 
 %Add dependencies.
-addpath('../functions')
+addpath(genpath('../functions'))
 addpath(genpath('../../aux'))
 
 %Construct the default grid
