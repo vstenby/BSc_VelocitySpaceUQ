@@ -1,4 +1,4 @@
-function analyze_sim(varargin)
+function [x_mu, x_std, p] = analyze_sim(varargin)
 % Analyzes the simulation in one of two ways:
 %
 % analyze(folder)
@@ -32,8 +32,9 @@ if analyze_folder
             load(strcat(folderName,'/sim',num2str(sim_number),'.mat'))
             fprintf('Analysis of sim%d\n',sim_number)
             
-            %Call the analysis function
-            analyze_single_sim(nsim, F_sim, alph_sim, lam_sim, del_sim, gridinfo)
+            %Call the analysis function. Perhaps fix this such that they
+            %don't change size.
+            [x_mu(:,sim_number), x_std(:,sim_number), p(sim_number)] = analyze_single_sim(nsim, F_sim, alph_sim, lam_sim, del_sim, gridinfo);
             disp(' ')
             
             val = input('Press enter to continue to next simulation or type 0 to stop. ');
@@ -49,12 +50,12 @@ if analyze_folder
         end
     end     
 else %IF NO FOLDER
-    analyze_single_sim(nsim, F_sim, alph_sim, lam_sim, del_sim, gridinfo)
+    [x_mu, x_std, p] = analyze_single_sim(nsim, F_sim, alph_sim, lam_sim, del_sim, gridinfo);
 end
 %END THE FUNCTION HERE.
 end
 
-function analyze_single_sim(nsim, F_sim, alph_sim, lam_sim, del_sim, gridinfo)
+function [x_mu, x_std, p] = analyze_single_sim(nsim, F_sim, alph_sim, lam_sim, del_sim, gridinfo)
 % 
 % Analyze the simulation
 %
@@ -81,8 +82,8 @@ fprintf('n = %d, nburnin = %d, geweke p = %f\n',nsim,nburnin, p)
 
 %Calculate and display quantiles.
 disp('Quantiles:')
-q_alpha = print_quantiles(alph_sim,'alpha');
-q_delta = print_quantiles(del_sim,'delta');
+q_alpha  = print_quantiles(alph_sim,'alpha');
+q_delta  = print_quantiles(del_sim,'delta');
 q_lambda = print_quantiles(lam_sim,'lambda');
 disp(' ')
 
@@ -125,6 +126,9 @@ figure(1)
 showDistribution(F_mu,gridinfo); title('Mean F');
 figure(2)
 showDistribution(F_std,gridinfo); title('Standard deviation F');
+
+x_mu  = F_mu;
+x_std = F_std;
 end
 
 function q = print_quantiles(v,str)
