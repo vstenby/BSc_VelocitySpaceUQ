@@ -7,11 +7,21 @@ function [x_mu, x_std, p] = analyze_sim(varargin)
 % 
 switch nargin
     case 1
-        analyze_folder = 1;
-        folderName = varargin{1};
-        %Fetches the nsim from foldername/setup.mat
-        load(strcat(folderName,'/setup.mat'),'nsim', 'gridinfo'); 
-        %should contain nsim and gridinfo.
+        if endsWith(varargin{1},'.mat')
+            %analyze a .mat file
+            analyze_folder = 0;
+            load(varargin{1},'nsim','F_sim','alph_sim','del_sim','lam_sim','gridinfo');
+        else
+            %analyze a folder
+            analyze_folder = 1;
+            folderName = varargin{1};
+            %Fetches the nsim from foldername/setup.mat        
+            analyze_folder = 1;
+            folderName = varargin{1};
+            %Fetches the nsim from foldername/setup.mat
+            load(strcat(folderName,'/setup.mat'),'nsim', 'gridinfo'); 
+            %should contain nsim and gridinfo.
+        end
     case 6
         analyze_folder = 0;
         nsim           = varargin{1};
