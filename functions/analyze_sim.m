@@ -10,7 +10,7 @@ switch nargin
         if endsWith(varargin{1},'.mat')
             %analyze a .mat file
             analyze_folder = 0;
-            load(varargin{1},'nsim','F_sim','alph_sim','del_sim','lam_sim','gridinfo');
+            load(varargin{1},'nsim','x_sim','alph_sim','del_sim','lam_sim','gridinfo');
         else
             %analyze a folder
             analyze_folder = 1;
@@ -25,7 +25,7 @@ switch nargin
     case 6
         analyze_folder = 0;
         nsim           = varargin{1};
-        F_sim          = varargin{2};
+        x_sim          = varargin{2};
         alph_sim       = varargin{3};
         del_sim        = varargin{4};
         lam_sim        = varargin{5};
@@ -44,7 +44,7 @@ if analyze_folder
             
             %Call the analysis function. Perhaps fix this such that they
             %don't change size.
-            [x_mu(:,sim_number), x_std(:,sim_number), p(sim_number)] = analyze_single_sim(nsim, F_sim, alph_sim, lam_sim, del_sim, gridinfo);
+            [x_mu(:,sim_number), x_std(:,sim_number), p(sim_number)] = analyze_single_sim(nsim, x_sim, alph_sim, lam_sim, del_sim, gridinfo);
             disp(' ')
             
             val = input('Press enter to continue to next simulation or type 0 to stop. ');
@@ -60,12 +60,12 @@ if analyze_folder
         end
     end     
 else %IF NO FOLDER
-    [x_mu, x_std, p] = analyze_single_sim(nsim, F_sim, alph_sim, lam_sim, del_sim, gridinfo);
+    [x_mu, x_std, p] = analyze_single_sim(nsim, x_sim, alph_sim, lam_sim, del_sim, gridinfo);
 end
 %END THE FUNCTION HERE.
 end
 
-function [x_mu, x_std, p] = analyze_single_sim(nsim, F_sim, alph_sim, lam_sim, del_sim, gridinfo)
+function [x_mu, x_std, p] = analyze_single_sim(nsim, x_sim, alph_sim, lam_sim, del_sim, gridinfo)
 % 
 % Analyze the simulation
 %
@@ -76,7 +76,7 @@ nburnin = floor(0.1*nsim);
 alph_sim = alph_sim(nburnin+1:end);
 del_sim = del_sim(nburnin+1:end);
 lam_sim = lam_sim(nburnin+1:end);
-F_sim = F_sim(:, nburnin+1:end);
+x_sim = x_sim(:, nburnin+1:end);
 
 %Geweke tests.
 %1 = stationary, 0 = not stationary.
@@ -99,20 +99,19 @@ disp(' ')
 
 %Plot the chains
 input('Press enter to show plot of alpha, lambda and delta chains ')
-close all
-figure(1)
+
+figure
 plot(alph_sim); title('\alpha chain')
-figure(2)
+figure
 plot(del_sim); title('\delta chain')
-figure(3)
+figure
 plot(lam_sim); title('\lambda chain')
 
 %Plot the histograms
 input('Press enter to show histograms and scatterplot ')
-close all
 
 nbins = 50;
-figure(1)
+figure
 subplot(1,3,1)
 hist(alph_sim,nbins); title('\alpha'); axis square
 subplot(1,3,2)
@@ -121,24 +120,21 @@ subplot(1,3,3)
 hist(lam_sim,nbins); title('\lambda'); axis square
 %histogram works weird with lambda, using hist instead.
 
-figure(2)
+figure
 scatter(del_sim,lam_sim,'.k')
 xlabel('\delta')
 ylabel('\lambda')
 
 
-input('Press enter to show mean and std of F ')
-close all
-F_mu = mean(F_sim,2);
-F_std = std(F_sim,0,2);
+input('Press enter to show mean and std of X ')
+x_mu = mean(x_sim,2);
+x_std = std(x_sim,0,2);
 
-figure(1)
-showDistribution(F_mu,gridinfo); title('Mean F');
-figure(2)
-showDistribution(F_std,gridinfo); title('Standard deviation F');
+figure
+showDistribution(x_mu,gridinfo); title('Mean X');
+figure
+showDistribution(x_std,gridinfo); title('Standard deviation X');
 
-x_mu  = F_mu;
-x_std = F_std;
 end
 
 function q = print_quantiles(v,str)
