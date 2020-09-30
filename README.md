@@ -8,6 +8,11 @@ Author: Viktor Stenby Johansson
 
 Supervisors: Per Christian Hansen, Yiqiu Dong, Jakob Sauer Jørgensen and Mirko Salewski.
 
+Drifting bi-Maxwellian distribution             |  Isotropic slowing-down distribution
+:-------------------------:|:-------------------------:
+![Image of Yaktocat](https://github.com/vstenby/BSc_VelocitySpaceUQ/blob/master/images/biMax_mean.svg)  |  ![Image of Yaktocat](https://github.com/vstenby/BSc_VelocitySpaceUQ/blob/master/images/isoSD_mean.svg)
+![Image of Yaktocat](https://github.com/vstenby/BSc_VelocitySpaceUQ/blob/master/images/biMax_std.svg)  |  ![Image of Yaktocat](https://github.com/vstenby/BSc_VelocitySpaceUQ/blob/master/images/isoSD_std.svg)
+
 ## Folder structure
 
 In order for the code to work, you will need the following folder structure:
@@ -17,6 +22,8 @@ In order for the code to work, you will need the following folder structure:
 │   ├── README.md
 │   ├── functions
 │   ├── demos
+│   ├── simulation
+│   ├── images
 │   ├── testprobs
 │   └── other
 │       └── tomoanalyticV
