@@ -1,4 +1,4 @@
-function [S, info] = biMaxS(u, phi, Tpara, Tperp, vparadrift, options)
+function [b, info] = biMaxb(u, phi, Tpara, Tperp, vparadrift, options)
 % This function returns the analytical projections of the bi-Maxwellian
 % distribution function.
 %
@@ -53,11 +53,11 @@ else
     uvec = u;
 end
 
-S = [];
+b = [];
 n_points = length(uvec);
 phivec = phi;
 
-%Constructing S analytically.
+%Constructing b analytically for each phi.
 for i = 1:length(phivec)
     phi = phivec(i);
     Teff=Tperp*(sin(phi/180*pi))^2+Tpara*(cos(phi/180*pi))^2; %Equation (72), denoted Tu.
@@ -67,11 +67,11 @@ for i = 1:length(phivec)
     idx2 = idx1+n_points - 1;
     
     %u_d is specified in Equation 73 but written inline here.
-    S(idx1 : idx2) = ne*(Mi/(2*pi*Teff*Qe))^0.5*exp(-(Mi*(uvec-vparadrift*cos(phi/180*pi)).^2)/(2*Teff*Qe)); %Equation (72)
+    b(idx1 : idx2) = ne*(Mi/(2*pi*Teff*Qe))^0.5*exp(-(Mi*(uvec-vparadrift*cos(phi/180*pi)).^2)/(2*Teff*Qe)); %Equation (72)
 end
 
-%Return S as a column vector.
-S = S'; 
+%Return b as a column vector.
+b = b'; 
 
 %Saving the relevant parameters to the info structure.
 info.u = uvec;

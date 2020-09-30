@@ -1,4 +1,4 @@
-function [F, info] = biMaxF(vpara, vperp, Tpara, Tperp, vparadrift, options)
+function [x, info] = biMaxx(vpara, vperp, Tpara, Tperp, vparadrift, options)
 % This function evaluates the drifting bi-Maxwellian.
 %
 %
@@ -50,10 +50,10 @@ vthpara=sqrt(2*Tpara*Qe/Mi);
 vthperp=sqrt(2*Tperp*Qe/Mi);
 
 %Equation 69.
-F = (2*ne*vperp)/(sqrt(pi)*vthpara*vthperp.^2) .* exp(-((vpara-vparadrift)/vthpara).^2-(vperp/vthperp).^2);
+x = (2*ne*vperp)/(sqrt(pi)*vthpara*vthperp.^2) .* exp(-((vpara-vparadrift)/vthpara).^2-(vperp/vthperp).^2);
 
-if any(size(F) == 1)
-    F = reshape(F, numel(F), 1);
+if any(size(x) == 1)
+    x = reshape(x, numel(x), x);
 end
 
 %Saving the relevant parameters to the info structure.
