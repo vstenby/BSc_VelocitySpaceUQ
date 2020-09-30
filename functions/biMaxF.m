@@ -3,8 +3,8 @@ function [F, info] = biMaxF(vpara, vperp, Tpara, Tperp, vparadrift, options)
 %
 %
 % If not specified, these will be the default values:
-% Tpara = 200e3 eV
-% Tperp = 200e3 eV
+% Tpara = 200e3 eV - perhaps rewrite to 2e5 eV.?
+% Tperp = 200e3 eV - perhaps rewrite to 2e5 eV.?
 % vparadrift = 5e6
 % Mi = 4*(1.6726e-27)
 % ne = 1e19
