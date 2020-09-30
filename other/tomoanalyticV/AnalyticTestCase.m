@@ -68,7 +68,7 @@ for uresolution=0.1
     du=uresolution*1e6;
     %   utargetvec=[-1:uresolution:1]*1e6;
     utargetvec=[-5:uresolution:5]*1e6;
-    
+    disp(du)
     %   for phivecr=2:2:90
     %for phi1=4:4:90
     %    for phi2=4:4:phi1
@@ -87,9 +87,10 @@ for uresolution=0.1
                 gamma2=acos((utarget+du/2-cos(phi/180*pi).*VPARA)./(sin(phi/180*pi).*VPERP));
                 wv=real((gamma1-gamma2))/pi/du*dvpara*dvperp;
                 transfermatrixCTS(transferrow,:)=reshape(wv,1,rows*columns);
-                if sum(sum(wv))<eps
-                    transferrow=transferrow-1;
-                end
+                %if sum(sum(wv))<eps
+                %    transferrow=transferrow-1; 
+                %    %Viktor: I commented this out - no idea why this is here...
+                %end
             end
         end
     end
@@ -99,19 +100,19 @@ A = transfermatrixCTSfine;
 
 
 %plot examples lines from the fine transfer matrix
-for i=10:10:375
-figure(100+i);clf;hold on;box on;set(gca, 'Layer','top');
-imagesc(vparafine/1e6,vperpfine/1e6,reshape(transfermatrixCTSfine(i,:),length(vperpfine),length(vparafine)))
-set(gca,'ydir','normal')
-colorbar
-caxis([0 max(max(transfermatrixCTSfine(i,:)))])
-axis equal
-set(gca,'Fontsize',16)
-xlabel('v_{||} [10^6 m/s]')
-ylabel('v_\perp [10^6 m/s]')
-axis([vparafine(1) vparafine(end) 0 vperpfine(end)]/1e6)
-colormap(flipud(hot))
-end
+%for i=10:10:375
+%figure(100+i);clf;hold on;box on;set(gca, 'Layer','top');
+%imagesc(vparafine/1e6,vperpfine/1e6,reshape(transfermatrixCTSfine(i,:),length(vperpfine),length(vparafine)))
+%set(gca,'ydir','normal')
+%colorbar
+%caxis([0 max(max(transfermatrixCTSfine(i,:)))])
+%axis equal
+%set(gca,'Fontsize',16)
+%xlabel('v_{||} [10^6 m/s]')
+%ylabel('v_\perp [10^6 m/s]')
+%axis([vparafine(1) vparafine(end) 0 vperpfine(end)]/1e6)
+%colormap(flipud(hot))
+%end
 
 %plot examples lines from the coarse transfer matrix
 % for i=10:10:375
@@ -143,13 +144,16 @@ backgroundlevel=1*10^0;
 
 for isigma=1:length(S_noisy)
     transfermatrixCTS(isigma,:)=transfermatrixCTS(isigma,:)/e(isigma);
-    S_noisy_norm(isigma)=S_noisy(isigma)/e(isigma);
+    disp('Error')
+    disp(e(1))
+    S_noisy_norm(isigma)=S_noisy(isigma)/e(isigma); 
 end
 S_noisy_norm=S_noisy_norm';
 
 
 [xalpha,alpha] = TikhonovNonNeg(transfermatrixCTS,S_noisy_norm,vpara,vperp,1);
 
+%%
 figure(10); clf; hold on; box on;set(gca, 'Layer','top');
 for i=1:length(alpha)
     subplot(2,3,i)
@@ -180,5 +184,4 @@ axis([vpara(1) vpara(end) 0 vperp(end)]/1e6)
 colormap(flipud(hot))
 title('SIMULATION')
 
-toc
 
