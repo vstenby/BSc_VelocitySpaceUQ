@@ -1,4 +1,4 @@
-function [S_noisy, s] = add_noise(S0, noise_level, background_level)
+function [S_noisy, s, e] = add_noise(S0, noise_level, background_level)
 %Adds noise to the samples.
 
 if nargin == 1
@@ -19,4 +19,8 @@ s = noise_level*mean(sqrt(S0)).*max([sqrt(S0) e_min_vector],[],2);
 e = randn(size(S0)).*s;
 
 S_noisy = S0 + e;
+
+%Calculate another e. Not sure what this is, but it does the same in
+%generate_noisy_spectrum.
+e = noise_level*mean(sqrt(abs(S_noisy)))*max([sqrt(abs(S_noisy)) e_min_vector],[],2);
 end
