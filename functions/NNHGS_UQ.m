@@ -7,6 +7,10 @@ end
 
 [M,N] = size(A);
 
+if all(size(L) == 0)
+   L = speye(N); 
+end
+
 if disp_waitbar
     f = waitbar(1/n,'Finding initial xalpha');
 end
@@ -18,7 +22,8 @@ alph_sim   = zeros(n,1);
 x_sim      = zeros(N,n);
 
 %Find the initial xalpha
-xtemp = mosek_TikhNN(A,b,alpha0,L);
+xtemp = GPCG_TikhNN(A,b,alpha0,L);
+%xtemp = mosek_TikhNN(A,b,alpha0,L);
 
 LtL = L'*L;
 
@@ -51,12 +56,16 @@ for i=2:n
    chat = mvnrnd(zeros(N,1),del_sim(i)^(-1)*speye(N))';
    
    %Right hand side of (2.5) in BaHa20 divided with lambda.
-   rhs = A'*bhat + alph_sim(i)*L*chat;
+   rhs = A'*bhat + alph_sim(i)*L'*chat;
    
    %LHS is divided with lambda.
    B = @(x) (A' * (A*x)) + alph_sim(i)*LtL*x;
-   
-   xtemp = GPCG(B, rhs, zeros(N,1), 50, 5, 20, 1e-6);
+   try
+       %xtemp = GPCG(B, rhs, zeros(N,1), 50, 5, 20, 1e-6);
+       xtemp = GPCG(B, rhs, zeros(N,1));
+   catch
+       wup = 0;
+   end
    %xtemp = GPCG(B, rhs, zeros(N,1));
    
    x_sim(:,i) = xtemp;

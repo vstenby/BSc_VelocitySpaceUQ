@@ -83,9 +83,12 @@ D = @(n) spdiags([-ones(n,1) ones(n,1)],[-1 0],n,n);
 L = [kron(D(ny), speye(nx)) ; kron(speye(ny),D(nx))];
 L = chol(L'*L);
 
+%%
 %tic
 %x0th = mosek_TikhNN(A,b_noisy,1e8);
-x1st = mosek_TikhNN(A,b_noisy,1e-25,L);
+
+
+x1st = mosek_TikhNN(A,b_noisy,1.0e-24,L);
 %x0th = mosek_TikhNN(A_norm,b_norm,1e-8);
 %x1st = mosek_TikhNN(A_norm,b_norm,1e-8,L);
 
@@ -94,14 +97,24 @@ x1st = mosek_TikhNN(A,b_noisy,1e-25,L);
 figure
 showDistribution(x1st,gridinfo); title('1st order')
 
+
 %%
 %BiMax UQ
-nsim = 100;
+nsim = 3;
 tic
-[x_sim, del_sim, lam_sim, alph_sim] = NNHGS_UQ2(A,b_noisy,0,L,nsim,1);
+[x_sim, del_sim, lam_sim, alph_sim] = NNHGS_UQ(A,b_noisy,1.0e-25,[],nsim,1);
 toc
-%4 seconds per sample.
-analyze_sim(nsim, x_sim, alph_sim, del_sim, lam_sim, gridinfo)
+
+%% Reconstruct using the alpha used.
+
+
+
+
+
+%analyze_sim(nsim, x_sim, alph_sim, del_sim, lam_sim, gridinfo);
+
+%% Try using this.
+
 
 %% Alpha values for 1st order Tikhonov.
 %Number of alphas we should be looking at.

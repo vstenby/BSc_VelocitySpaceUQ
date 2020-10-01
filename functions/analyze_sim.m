@@ -1,4 +1,4 @@
-function [x_mu, x_std, p] = analyze_sim(varargin)
+function [x_mu, x_std, p, q_alpha, q_delta, q_lambda] = analyze_sim(varargin)
 % Analyzes the simulation in one of two ways:
 %
 % analyze(folder)
@@ -60,12 +60,12 @@ if analyze_folder
         end
     end     
 else %IF NO FOLDER
-    [x_mu, x_std, p] = analyze_single_sim(nsim, x_sim, alph_sim, lam_sim, del_sim, gridinfo);
+    [x_mu, x_std, p, q_alpha, q_delta, q_lambda] = analyze_single_sim(nsim, x_sim, alph_sim, lam_sim, del_sim, gridinfo);
 end
 %END THE FUNCTION HERE.
 end
 
-function [x_mu, x_std, p] = analyze_single_sim(nsim, x_sim, alph_sim, lam_sim, del_sim, gridinfo)
+function [x_mu, x_std, p, q_alpha, q_delta, q_lambda] = analyze_single_sim(nsim, x_sim, alph_sim, lam_sim, del_sim, gridinfo)
 % 
 % Analyze the simulation
 %
