@@ -6,58 +6,130 @@ clear, clc, close all
 addpath('../functions')
 addpath(genpath('../../aux'))
 
-%Run biMax_recon2 example to get the different variables.
-run('biMax_recon2.m'); close all
-clearvars -except A A2hat S_noisy S2hat factor X gridinfo
-fprintf('Variables loaded from reconstruction example 2.\n\n')
+%Default grid
+[vpara, vperp, gridinfo] = construct_vgrid();
 
-alphaN = 50; %Number of alphas to be checked in the linspace.
-%50 takes approx. 11 minutes (on my MacBook)
+%Default biMax-distribution (x)
+[x_true, xinfo] = biMaxx(vpara,vperp);
 
-%In both cases, we need X to compare our reconstruction.
-%To find the optimal alpha for the non-normalized case, we need:
-%A, S_noisy
+%Construct the analytic projections (b)
+%Boundaries of the (E,p)-space
+ustruct.Emin = 10e3;
+ustruct.Emax = 4e6;
+%Number of points per spectrum
+ustruct.udim = 200;
+%Observation angles
+phi=[10 20 40 70 85];
+[b, binfo] = biMaxb(ustruct,phi);
+[b_noisy, ~, e] = add_noise(b,0.01); 
+%Construct the A matrix relating the two.
+ubroadening = 3; %default
+A = biMaxA(ubroadening,xinfo,binfo);
 
-%To find the optimal alpha for the normalized case, we need:
-%A2hat (normalized A), S2hat (normalized S), factor (to get to the absolute
-%valued case)
+%Normalization as done in AnalyticTestCase.m
+[A_norm, b_norm] = error_normalization(A,b_noisy,e);
 
-% Find the optimal alpha for the normal case.
-%This takes a while (~300s on my MacBook)
-fprintf('Finding optimal alpha for the normal case.\n')
-alphavec1 = logspace(6,9,alphaN);
-[~, error_dist1] = opt_alpha(alphavec1, A, S_noisy, X);
-%plot(alphavec1, error_dist1)
-[~, idx] = min(error_dist1);
-alpha_recon1 = alphavec1(idx);
-fprintf('Optimal alpha found.\n\n')
 
-%Optimal alpha I found for a given run with noise_level = 0.01.
-%alpha = 2.8118e+08;
+%%
 
-X_recon1 = mosek_TikhNN(A, S_noisy, alpha_recon1);
+%Number of alphas we should be looking at.
+alphaN = 20;
+alpha  = logspace(-15,-5,alphaN);
 
-% Normalized example.
-%This takes a while  (~380s on my Macbook)
-fprintf('Finding optimal alpha for the normalized case.\n')
-alphavec2 = logspace(-17, -14, alphaN);
-[~, error_dist2] = opt_alpha(alphavec2, A2hat, S2hat, X, factor);
-%plot(alphavec2, error_dist2)
-[~, idx] = min(error_dist2);
-alpha_recon2 = alphavec2(idx);
-fprintf('Optimal alpha found.\n\n')
+%Call mosek_Tikh for all alpha values. This takes a while.
+tic
+[x, resnorm, residual, exitflag, output] = mosek_TikhNN(A_norm, b_norm, alpha);
+toc
 
-%Optimal alpha I found for a given run.
-%alpha = 4.9417e-15;
+[r, min_idx] = relerr(x_true(:),x);
 
-X_recon2 = mosek_TikhNN(A2hat, S2hat, alpha_recon2).*factor;
+figure
+semilogx(alpha,r); title('alpha and relative error, zero-order Tikhonov')
+hold on
+plot(alpha(min_idx),r(min_idx),'k.','MarkerSize',15)
+title(sprintf('alpha=%.2e, relerr = %.4f, zero-order Tikhonov',alpha(min_idx),r(min_idx)))
 
-figure(1)
-sgtitle('Finding $\alpha$ for case with and without normalization','interpreter','latex')
+figure
 subplot(1,2,1)
-semilogx(alphavec1, error_dist1)
-title('Without normalization'); xlabel('\alpha');
+showDistribution(x(:,min_idx),gridinfo); title('xalpha, zero-order Tikhonov')
 subplot(1,2,2)
-semilogx(alphavec2, error_dist2); xlabel('\alpha')
-title('With normalization');
+showDistribution(x_true,gridinfo); title('x')
 
+
+%% Try the different L's. First, we try Per Christians L.
+nx = length(gridinfo.vpara_ax);
+ny = length(gridinfo.vperp_ax);
+
+%L = reguL(nx,ny);
+
+%ex = ones(nx,1);
+%Dxx = spdiags([ex -2*ex ex], [-1 0 1], nx, nx);
+
+%[L1vpara, L1vperp] = gradient_v_space_matrix(gridinfo.vpara_ax, gridinfo.vperp_ax, 'custom');
+
+%Lpch2 = [L1vpara;L1vperp];
+
+%figure
+%spy(Lpch)
+
+%figure
+%spy(Lpch2)
+%LtL = L1vpara'*L1vpara + L1vperp'*L1vperp;
+%LtL = sparse(LtL);
+%L = chol(LtL);
+
+I = @(n) speye(n);
+D = @(n) spdiags([-ones(n,1) ones(n,1)],[-1 0],n,n);
+L = [kron(D(ny), speye(nx)) ; kron(speye(ny),D(nx))];
+L = chol(L'*L);
+
+%tic
+%x0th = mosek_TikhNN(A,b_noisy,1e8);
+x1st = mosek_TikhNN(A,b_noisy,1e-25,L);
+%x0th = mosek_TikhNN(A_norm,b_norm,1e-8);
+%x1st = mosek_TikhNN(A_norm,b_norm,1e-8,L);
+
+%figure
+%showDistribution(x0th,gridinfo); title('0th order')
+figure
+showDistribution(x1st,gridinfo); title('1st order')
+
+%%
+%BiMax UQ
+nsim = 100;
+tic
+[x_sim, del_sim, lam_sim, alph_sim] = NNHGS_UQ2(A,b_noisy,0,L,nsim,1);
+toc
+%4 seconds per sample.
+analyze_sim(nsim, x_sim, alph_sim, del_sim, lam_sim, gridinfo)
+
+%% Alpha values for 1st order Tikhonov.
+%Number of alphas we should be looking at.
+%alphaN = 5;
+%alpha  = logspace(-30,-25,alphaN);
+
+alpha = 1e-45;
+L = reguL(gridinfo);
+
+% ~365 seconds when running on my MacBook.
+%tic
+[x, resnorm, residual, exitflag, output] = mosek_TikhNN(A_norm, b_norm, alpha, L);
+%toc
+
+figure
+showDistribution(x,gridinfo)
+
+[r, min_idx] = relerr(x_true(:),x);
+
+%% 
+[r, min_idx] = relerr(x_true(:),x);
+
+figure
+semilogx(alpha,r); title('alpha and relative error, zero-order Tikhonov')
+hold on
+plot(alpha(min_idx),r(min_idx),'k.','MarkerSize',15)
+title(sprintf('alpha=%.2e, relerr = %.4f, 1st order Tikhonov',alpha(min_idx),r(min_idx)))
+
+%Optimal solution
+figure
+showDistribution(x(:,25),gridinfo)

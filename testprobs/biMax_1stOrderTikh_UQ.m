@@ -39,7 +39,13 @@ A = biMaxA(ubroadening,xinfo,binfo);
 %Per Christians way of constructing L.
 L = reguL(vparadim,vperpdim);
 
-[xalpha, resnorm, residual, exitflag, output] = mosek_TikhNN(A_norm,b_norm,alpha,L);
+
+%%
+[L1vpara, L1vperp] = gradient_v_space_matrix(gridinfo.vpara_ax, gridinfo.vperp_ax, 'custom');
+LtL = L1vpara'*L1vpara + L1vperp'*L1vperp;
+
+
+
 
 % Relative error for each of these alphas.
 r = relerr(x_true(:),xalpha);
