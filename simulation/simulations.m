@@ -5,4 +5,4 @@ clear, clc, close all
 addpath(genpath('../functions'))
 addpath(genpath('../../aux'))
 
-analyze_sim('isoSD_UQ')
+analyze_sim('biMax_UQ')
