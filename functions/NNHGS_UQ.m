@@ -61,8 +61,8 @@ for i=2:n
    %LHS is divided with lambda.
    B = @(x) (A' * (A*x)) + alph_sim(i)*LtL*x;
    try
-       %xtemp = GPCG(B, rhs, zeros(N,1), 50, 5, 20, 1e-6);
-       xtemp = GPCG(B, rhs, zeros(N,1));
+       xtemp = GPCG(B, rhs, zeros(N,1), 50, 5, 20, 1e-6);
+       %xtemp = GPCG(B, rhs, zeros(N,1));
    catch
        wup = 0;
    end

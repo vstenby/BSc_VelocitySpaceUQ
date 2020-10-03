@@ -1,4 +1,4 @@
-function [S, info] = isoSDS(u, phi, Ecrit, Ebirth, Ebirthwidth, options)
+function [b, info] = isoSDb(u, phi, Ecrit, Ebirth, Ebirthwidth, options)
 % This function evaluates the isotropic slowing-down distribution.
 %
 %
@@ -16,7 +16,14 @@ Mp = 1.6726e-27;    %Mass of proton
 Qe = 1.6021917e-19; %Elementary charge
 
 %A bit of code duplication, perhaps ask Jakob how to do this better.
-if nargin == 2
+if nargin == 1
+    phi = [];
+    Ecrit=44*20000;  %eV
+    Ebirth=3.5e6; %eV
+    Ebirthwidth=6e4;
+    options.Mi = 4*Mp;
+    options.ne = 1e19; 
+elseif nargin == 2
     Ecrit=44*20000;  %eV
     Ebirth=3.5e6; %eV
     Ebirthwidth=6e4;
@@ -61,9 +68,11 @@ guSD=ne/((log(1+(vbirth/vcrit)^3))*4*vcrit)*(log(abs((vbirth^2-vcrit*vbirth+vcri
 
 guSD = guSD';
 
-S = guSD;
-S = repmat(S, [length(phi),1]); %Since S doesn't depend on phi, this is repeated.
+b = guSD;
 
+if ~isempty(phi)
+    b = repmat(b, [length(phi),1]); %Since b doesn't depend on phi, this is repeated.
+end
 
 %Saving the relevant parameters to the info structure.
 info.u           = uvec;
@@ -74,9 +83,6 @@ info.Ebirthwidth = Ebirthwidth;
 info.Mi          = Mi;
 info.ne          = ne;
 info.phi         = phi;
-
-
-
 
 end
 

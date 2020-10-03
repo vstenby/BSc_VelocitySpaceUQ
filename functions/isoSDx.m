@@ -1,4 +1,4 @@
-function [F, info] = isoSDF(vpara, vperp, Ecrit, Ebirth, Ebirthwidth, options)
+function [X, info] = isoSDx(vpara, vperp, Ecrit, Ebirth, Ebirthwidth, options)
 % This function evaluates the isotropic slowing-down distribution.
 %
 %
@@ -47,7 +47,7 @@ vcrit=sqrt(2*Ecrit*Qe/Mi);
 vbirth=sqrt(2*Ebirth*Qe/Mi);
 
 fvpavpe3DSD=ne*3/(4*pi)/(log(1+(vbirth/vcrit)^3))./((vpara.^2+vperp.^2).^1.5+vcrit^3).*erfc((0.5*Mi*(vpara.^2+vperp.^2)/Qe-Ebirth)/Ebirthwidth)/2;
-F = fvpavpe3DSD.*(2*pi*vperp);
+X = fvpavpe3DSD.*(2*pi*vperp);
 
 %Saving the relevant parameters to the info structure.
 info.vpara       = vpara;
