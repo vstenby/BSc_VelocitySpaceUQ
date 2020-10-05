@@ -5,7 +5,6 @@ function [x_sim, del_sim, lam_sim, alph_sim] = NNHGS_UQ(A, b, alpha0, L, n, opti
 if nargin <= 5
     options.waitbar = 1;
     options.welford = 0; 
-    options.trim = 1;
 end
 
 if ~isstruct(options), error('Wrong options parsed to function.'), end
