@@ -134,10 +134,10 @@ showDistribution(x1st(:,idx1),gridinfo); title('Optimal 1st order Tikhonov');
 %% 3) Uncertainty Quantification
 
 % 3a) UQ for the 0th order Tikhonov formulation
-[xUQ0th, del0th, lam0th, alph0th] = NNHGS_UQ(A, b_noisy, 0, [], nsim, 1);
+[xUQ0th, del0th, lam0th, alph0th] = NNHGS_UQ(A, b_noisy, 0, [], nsim);
 
 % 3b) UQ for the 1st order Tikhonov formulation
-[xUQ1st, del1st, lam1st, alph1st] = NNHGS_UQ(A, b_noisy, 0, L, nsim, 1);
+[xUQ1st, del1st, lam1st, alph1st] = NNHGS_UQ(A, b_noisy, 0, L, nsim);
 
 %Analyze the two simulations.
 analyze_sim(nsim, xUQ0th, alph0th, del0th, lam0th, gridinfo);
