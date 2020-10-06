@@ -1,8 +1,27 @@
-function [x_sim, del_sim, lam_sim, alph_sim] = NNHGS_UQ(A, b, alpha0, L, n, disp_waitbar)
+function [x_sim, del_sim, lam_sim, alph_sim] = NNHGS_UQ(A, b, alpha0, L, n, options)
 %Nonnegative Hierachical Gibbs Sampler.
+%Perhaps make an option feature to this function.
 
 if nargin <= 5
-    disp_waitbar = 0;  
+    options.waitbar = 1;
+    options.welford = 0; 
+end
+
+if ~isstruct(options), error('Wrong options parsed to function.'), end
+
+if options.welford
+    %Number of burnin should be specified, otherwise we take floor(0.1*n)
+    if ~isfield(options,'nburnin')
+        warning("No burn-in specified. Welford's online algorithm might result in invalid mean and standard deviation if chains are not stationary.")
+        options.nburnin = floor(0.1*n);
+    end
+    
+    %if ~isfield(options,'welford_disp')
+    %    %Display the mean and standard deviation while sampling.
+    %    options.welford_disp = 0;
+    %end
+    
+    welford_init = 0; %Welford's online algorithm has not been initialized.
 end
 
 [M,N] = size(A);
@@ -11,7 +30,7 @@ if all(size(L) == 0)
    L = speye(N); 
 end
 
-if disp_waitbar
+if options.waitbar
     f = waitbar(1/n,'Finding initial xalpha');
 end
 
@@ -19,7 +38,12 @@ end
 del_sim    = zeros(n,1);
 lam_sim    = zeros(n,1);
 alph_sim   = zeros(n,1);
-x_sim      = zeros(N,n);
+
+if options.welford 
+    x_sim = zeros(N,2); %where first column is mean, second column is standard deviation.
+else
+    x_sim = zeros(N,n); %where each column is a sample.
+end
 
 %Find the initial xalpha
 xtemp = GPCG_TikhNN(A,b,alpha0,L);
@@ -40,7 +64,7 @@ a1         = 1;
 t1         = 0.0001;
 
 for i=2:n
-   if disp_waitbar, waitbar(i/n, f, 'Sampling...'), end
+   if options.waitbar, waitbar(i/n, f, 'Sampling...'), end
    Axtemp = A*xtemp;
    LtLxtemp = LtL*xtemp;
    
@@ -60,16 +84,43 @@ for i=2:n
    
    %LHS is divided with lambda.
    B = @(x) (A' * (A*x)) + alph_sim(i)*LtL*x;
-   try
-       xtemp = GPCG(B, rhs, zeros(N,1), 50, 5, 20, 1e-6);
-       %xtemp = GPCG(B, rhs, zeros(N,1));
-   catch
-       wup = 0;
-   end
+   
+   xtemp = GPCG(B, rhs, zeros(N,1), 50, 5, 20, 1e-6);
    %xtemp = GPCG(B, rhs, zeros(N,1));
    
-   x_sim(:,i) = xtemp;
-    
+   if options.welford
+       %Welford's Online Algorithm
+       %First, we want to make sure we are past the nburnin.
+       if options.nburnin < i
+           %With Welford's online algorithm, we take the next i from
+           %nburnin with mod(i,trim) == 0.
+           if ~welford_init
+               %M1 and S1 has to be initialized as xtemp and 0.
+               Mk = xtemp; 
+               Sk = zeros(size(xtemp));
+               welford_init = 1;
+               %welford_i = 1; %i for calculating rolling average, 
+               % i from the loop can't be used if we're trimming.
+           else
+               Mprev = Mk; %M_{k-1}
+               Sprev = Sk; %S_{k-1}
+               %We use the recurrence formulas
+               Mk = Mprev + (xtemp - Mprev)/i; %Rewrite this if we need to trim.
+               Sk = Sprev + (xtemp - Mprev).*(xtemp - Mk);
+               wellford_i = wellford_i + 1;
+           end
+       end
+   else
+       %Save xsim.
+       x_sim(:,i) = xtemp;
+   end 
 end
-if disp_waitbar, close(f), end
+
+if options.welford
+    %x_sim(:,1) is mean
+    %x_sim(:,2) is standard deviation
+    x_sim(:,1) = Mk;
+    x_sim(:,2) = (Sk/(i-1)).^(1/2);
+end
+if options.waitbar, close(f), end
 end
