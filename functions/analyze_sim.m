@@ -76,7 +76,12 @@ nburnin = floor(0.1*nsim);
 alph_sim = alph_sim(nburnin+1:end);
 del_sim = del_sim(nburnin+1:end);
 lam_sim = lam_sim(nburnin+1:end);
-x_sim = x_sim(:, nburnin+1:end);
+
+if size(x_sim,2) ~= 2
+    %If size(x_sim,2) is 2, then we assume that x(:,1) is mean, x(:,2) is
+    %std.
+    x_sim = x_sim(:, nburnin+1:end);
+end
 
 %Geweke tests.
 %1 = stationary, 0 = not stationary.
@@ -127,8 +132,14 @@ ylabel('\lambda')
 
 
 input('Press enter to show mean and std of X ')
-x_mu = mean(x_sim,2);
-x_std = std(x_sim,0,2);
+if size(x_sim,2) == 2
+    %x(:,1) is mu, x(:,2) is standard deviation
+    x_mu  = x_sim(:,1);
+    x_std = x_sim(:,2);
+else
+    x_mu = mean(x_sim,2);
+    x_std = std(x_sim,0,2);
+end
 
 figure
 showDistribution(x_mu,gridinfo); title('Mean X');

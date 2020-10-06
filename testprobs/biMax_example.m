@@ -99,7 +99,8 @@ end
 L = reguL(vparadim,vperpdim); %L'L is eq. (16) in Jacobsen 2016 Phys Control.
 
 %L has to be square for UQ.
-L = chol(L'*L);
+%Tried to outcomment this.
+%L = chol(L'*L);
 
 %% 2) Reconstruction
 x0th = GPCG_TikhNN(A, b_noisy, alphavec);    %0th order Tikhonov
@@ -134,7 +135,7 @@ showDistribution(x1st(:,idx1),gridinfo); title('Optimal 1st order Tikhonov');
 %% 3) Uncertainty Quantification
 
 % 3a) UQ for the 0th order Tikhonov formulation
-[xUQ0th, del0th, lam0th, alph0th] = NNHGS_UQ(A, b_noisy, 0, [], nsim);
+%[xUQ0th, del0th, lam0th, alph0th] = NNHGS_UQ(A, b_noisy, 0, [], nsim);
 
 % 3b) UQ for the 1st order Tikhonov formulation
 [xUQ1st, del1st, lam1st, alph1st] = NNHGS_UQ(A, b_noisy, 0, L, nsim);

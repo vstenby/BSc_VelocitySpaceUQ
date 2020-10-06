@@ -77,7 +77,10 @@ for i=2:n
    
    %Generate bhat and chat.
    bhat = mvnrnd(b,lam_sim(i)^(-1)*speye(M))';
-   chat = mvnrnd(zeros(N,1),del_sim(i)^(-1)*speye(N))';
+   
+   %NOTE: I tried to change the dimensions of chat here.
+   %chat = mvnrnd(zeros(N,1),del_sim(i)^(-1)*speye(N))';
+   chat = mvnrnd(zeros(size(L,1),1),del_sim(i)^(-1)*speye(size(L,1)))';
    
    %Right hand side of (2.5) in BaHa20 divided with lambda.
    rhs = A'*bhat + alph_sim(i)*L'*chat;
@@ -107,7 +110,7 @@ for i=2:n
                %We use the recurrence formulas
                Mk = Mprev + (xtemp - Mprev)/i; %Rewrite this if we need to trim.
                Sk = Sprev + (xtemp - Mprev).*(xtemp - Mk);
-               wellford_i = wellford_i + 1;
+               %wellford_i = wellford_i + 1;
            end
        end
    else
