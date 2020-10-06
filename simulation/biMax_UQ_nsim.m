@@ -56,5 +56,3 @@ for i=1:length(nsim)
     save(simname,'x','del_sim','lam_sim','alph_sim', 'n', 'gridinfo')
 end
 
-
-
