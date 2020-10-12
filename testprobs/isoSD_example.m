@@ -55,14 +55,10 @@ switch example
 end
 
 %Add noise to b.
-%[b_noisy, ~, e] = add_noise(b,0.01);  - This adds imaginary noise.
-b_noisy = b + 0.05*randn(size(b));
+[b_noisy, ~, e] = add_noise(b,0.01);
 
 %This is for the 1st order Tikhonov.
 L = reguL(vparadim,vperpdim); %L'L is eq. (16) in Jacobsen 2016 Phys Control.
-
-%L has to be square for UQ.
-L = chol(L'*L);
 
 %% 2) Reconstruction
 
