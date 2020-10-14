@@ -10,7 +10,7 @@ switch nargin
         if endsWith(varargin{1},'.mat')
             %analyze a .mat file
             analyze_folder = 0;
-            load(varargin{1},'nsim','x_sim','alph_sim','del_sim','lam_sim','gridinfo');
+            load(varargin{1},'x_sim','alph_sim','del_sim','lam_sim','gridinfo');
         else
             %analyze a folder
             analyze_folder = 1;
@@ -19,17 +19,16 @@ switch nargin
             analyze_folder = 1;
             folderName = varargin{1};
             %Fetches the nsim from foldername/setup.mat
-            load(strcat(folderName,'/setup.mat'),'nsim', 'gridinfo'); 
-            %should contain nsim and gridinfo.
+            load(strcat(folderName,'/setup.mat'),'gridinfo'); 
+            %should contain gridinfo.
         end
-    case 6
+    case 5
         analyze_folder = 0;
-        nsim           = varargin{1};
-        x_sim          = varargin{2};
-        alph_sim       = varargin{3};
-        del_sim        = varargin{4};
-        lam_sim        = varargin{5};
-        gridinfo       = varargin{6};
+        x_sim          = varargin{1};
+        alph_sim       = varargin{2};
+        del_sim        = varargin{3};
+        lam_sim        = varargin{4};
+        gridinfo       = varargin{5};
     otherwise
         error('Wrong number of inputs.')
 end
@@ -44,6 +43,7 @@ if analyze_folder
             
             %Call the analysis function. Perhaps fix this such that they
             %don't change size.
+            nsim = size(x_sim,2);
             [x_mu(:,sim_number), x_std(:,sim_number), p(sim_number)] = analyze_single_sim(nsim, x_sim, alph_sim, lam_sim, del_sim, gridinfo);
             disp(' ')
             
@@ -60,6 +60,7 @@ if analyze_folder
         end
     end     
 else %IF NO FOLDER
+    nsim = length(alph_sim);
     [x_mu, x_std, p, q_alpha, q_delta, q_lambda] = analyze_single_sim(nsim, x_sim, alph_sim, lam_sim, del_sim, gridinfo);
 end
 %END THE FUNCTION HERE.
