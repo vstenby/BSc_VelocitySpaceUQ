@@ -66,6 +66,17 @@ vbirth=sqrt(2*Ebirth*Qe/Mi);
 guSD=ne/((log(1+(vbirth/vcrit)^3))*4*vcrit)*(log(abs((vbirth^2-vcrit*vbirth+vcrit^2)./(uvec.^2-vcrit*abs(uvec)+vcrit^2)))+...
     log(((abs(uvec)+vcrit)/(vbirth+vcrit)).^2)+2*sqrt(3)*(atan((2*vbirth-vcrit)/(sqrt(3)*vcrit))-atan((2*abs(uvec)-vcrit)/(sqrt(3)*vcrit)))).*erfc((0.5*Mi*uvec.^2/Qe-Ebirth)/Ebirthwidth)/2; 
 
+%Rewrite guSD to avoid cancellation
+%arctan difference:
+%arctan a - arctan b = arctan[(a-b)/(1+a*b)]
+%alpha = (2*vbirth-vcrit)/(sqrt(3)*vcrit);
+%beta  = (2*abs(uvec)-vcrit)/(sqrt(3)*vcrit);
+%guSD=ne/((log(1+(vbirth/vcrit)^3))*4*vcrit)*(log(abs((vbirth^2-vcrit*vbirth+vcrit^2)./(uvec.^2-vcrit*abs(uvec)+vcrit^2)))+...
+%    log(((abs(uvec)+vcrit)/(vbirth+vcrit)).^2)+2*sqrt(3)*(atan((alpha-beta)/(1+alpha.*beta)))).*erfc((0.5*Mi*uvec.^2/Qe-Ebirth)/Ebirthwidth)/2; 
+
+%Set the values where |u| > vb to zero, as Mirko suggested.
+guSD(abs(uvec)>vbirth) = 0;
+
 guSD = guSD';
 
 b = guSD;
