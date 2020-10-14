@@ -1,6 +1,10 @@
 %% biMax Angle Simulation 14-10-2020
 clear, clc, close all
 
+%Add dependencies.
+addpath(genpath('../functions'))
+addpath(genpath('../../aux'))
+
 %Construct the default grid
 [vpara, vperp, gridinfo] = construct_vgrid();
 vparadim = length(gridinfo.vpara_ax);
@@ -38,8 +42,8 @@ for i=1:length(thirdangle)
     A = biMaxA(ubroadening, xinfo, binfo);
     
     welford.keep = 1;           %No trimming
-    welford.nburnin = 1000;     %1k burnin
-    nsim = 10000;               %10k samples
+    welford.nburnin = 500;      %.5k burnin
+    nsim = 5000;                %5k samples
     
     [x, alpha, delta, lambda, info] = NNHGS(A,b_noisy,L,nsim,welford);
     
