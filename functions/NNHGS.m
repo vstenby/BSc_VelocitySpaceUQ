@@ -1,46 +1,28 @@
-function [x, alpha, delta, lambda, info] = NNHGS(A,b,L,n,options)
+function [x, alpha, delta, lambda, info] = NNHGS(A,b,L,n,welford)
 % Nonnegative Hierachical Gibbs Sampler
 
 if nargin <= 4
-    %Options are not specified
-    options.welford = 0;
-    options.keep = 1;
-    options.nburnin = floor(0.1*n);
-    options.waitbar = 1;
+    welford.welford = 0;
+elseif nargin == 5
+    %Welford options 
+    if ~isstruct(welford), error('Welford should be a struct'); end
+    welford.welford = 1;
+    if ~isfield(welford,'keep'), error('Trimming should be specified with Welford'), end
+    if ~isfield(welford,'nburnin'), error('nburnin should be specified with Welford'), end
+else
+    error('Wrong number of arguments')
 end
 
-if ~isfield(options,'saveallx'), options.saveallx = 0; end
-if ~isfield(options,'waitbar'), options.waitbar = 1; end
-if ~isfield(options,'keep'), options.keep = 1; end
-if ~isfield(options,'welford'), options.welford = 0; end
-if ~isfield(options,'alpha0'), options.alpha0 = 0; end
-    
-if ~isfield(options,'welford') && isfield(options,'keep')
-   warning('NNHGS only trims if options.welford = 1') 
-end
-if ~isfield(options,'nburnin') && options.welford
-    s1 = 'nburnin not specified, using nburnin = floor(0.1*n).';
-    s2 = "Results from Welford's Online Algorithm might not be correct if chains are not stationary due to too small nburnin.";
-    warning('foo:bar',strcat(s1,'\n',s2))
-end
-
-if ~isfield(options,'nburnin')
-    if options.keep == 1
-        options.nburnin = floor(0.1*n);
-    else
-        options.nburnin = floor((options.keep*n)/(1/0.1-1)); 
-    end
-end
-
-%Number of samples to be generated in order to return n samples.
-if options.welford
-    nsamps = n*options.keep + options.nburnin;
-    %Fix so that we don't do too many samps.
-    nsamps = 1:options.keep:nsamps;
-    nsamps = nsamps(end);
+if welford.welford
+    nidx = [1:welford.keep:n*welford.keep];
+    nidx = nidx + welford.nburnin;
+    nsamps = nidx(end);
 else
     nsamps = n;
 end
+   
+%Perhaps make disp_waitbar an input to the function
+disp_waitbar = 1;
 
 %Allocate the delta, lambda and alpha
 del_sim  = zeros(nsamps,1);
@@ -53,18 +35,19 @@ if all(size(L) == 0)
    L = speye(N); 
 end
 
-if options.welford
+if welford.welford
     x = zeros(N,2);
 else
     x = zeros(N,nsamps);
 end
 
-if options.waitbar
+if disp_waitbar
     f = waitbar(1/nsamps,'Finding initial xalpha');
 end
 
 %Initial sample.
-alpha0 = options.alpha0;
+alpha0 = 0; %This should be a parameter in the options as well.
+
 xtemp = GPCG_TikhNN(A,b,alpha0,L);
 alph_temp = alpha0;
 lam_temp  = 1/norm(b(:)-A*xtemp(:))^2;
@@ -88,7 +71,7 @@ t1 = 0.0001;
 welford_i = 1;
 
 for i=2:nsamps
-   if options.waitbar, waitbar(i/nsamps, f, 'Sampling...'), end
+   if disp_waitbar, waitbar(i/nsamps, f, 'Sampling...'), end
    
    %NNHGS loop:
    Axtemp = A*xtemp;
@@ -115,8 +98,8 @@ for i=2:nsamps
    xtemp = GPCG(B, rhs, zeros(N,1), 50, 5, 20, 1e-6);
    
    %Perhaps Welford should be written into it's own function
-   if options.welford
-       if (mod(i-options.nburnin,options.keep) || options.keep == 1) == 1 && options.nburnin < i
+   if welford.welford
+       if (mod(i-welford.nburnin,welford.keep) || welford.keep == 1) == 1 && welford.nburnin < i
            %True if i = (nburnin+1)+keep*p, where p = 0, 1, ...
            if welford_i == 1
                %M1 and S1 has to be initialized as xtemp and 0.
@@ -145,11 +128,12 @@ end
 %Saving to the info struct.
 info.n = n;
 
-if options.welford
+if welford.welford
+    info.welford = 1;
     info.nsamps = nsamps;
-    info.nburnin = options.nburnin;
-    info.keep = options.keep;
-    info.nidx = [options.nburnin+1:options.keep:nsamps];
+    info.nburnin = welford.nburnin;
+    info.keep = welford.keep;
+    info.nidx = nidx';
     info.alpha = alph_sim;
     info.delta = del_sim;
     info.lambda = lam_sim;
@@ -160,17 +144,19 @@ if options.welford
     lambda = lam_sim(info.nidx);
 else
     %Return all of them.
+    info.welford = 0;
+    info.nsamps = n;
     alpha = alph_sim;
     delta = del_sim;
     lambda = lam_sim;
 end
 
-if options.welford
+if welford.welford
     x(:,1) = Mk; %mean
     x(:,2) = (Sk/(welford_i-1)).^(1/2); %standard deviation
 end
 
-if options.waitbar, close(f), end
+if disp_waitbar, close(f), end
 
 end
 
