@@ -63,7 +63,7 @@ for i=1:length(phis)
     L = reguL(vparadim,vperpdim); %L'L is eq. (16) in Jacobsen 2016 Phys Control.
 
     %L has to be square for UQ.
-    L = chol(L'*L);
+    %L = chol(L'*L);
     
     save(strcat(subfoldername, '/setup.mat'))
     

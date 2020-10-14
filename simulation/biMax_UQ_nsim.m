@@ -52,6 +52,8 @@ nsim = logspace(expo(1),expo(end),6);
 for i=1:length(nsim)
     n = nsim(i);
     simname = strcat(folderName,'/n_1e',num2str(expo(i)),'.mat');
+    %Set same seed.
+    rng('default')
     [x, del_sim, lam_sim, alph_sim] = NNHGS_UQ(A, b_noisy, 0, L, n, options);
     save(simname,'x','del_sim','lam_sim','alph_sim', 'n', 'gridinfo')
 end
