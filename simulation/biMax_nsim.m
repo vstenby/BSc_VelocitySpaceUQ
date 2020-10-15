@@ -1,5 +1,9 @@
-%% biMax Angle Simulation 14-10-2020
+%% biMax Nsim Simulation 14-10-2020
 clear, clc, close all
+
+%Add dependencies.
+addpath(genpath('../functions'))
+addpath(genpath('../../aux'))
 
 %Construct the default grid
 [vpara, vperp, gridinfo] = construct_vgrid();
@@ -26,12 +30,17 @@ L = reguL(vparadim,vperpdim); %L'L is eq. (16) in Jacobsen 2016 Phys Control.
 %Observation angles
 phi = [10 20 40 70 85];
 
-for i=1:5
-    nsim = 1e4;
+for i=2:5
+    nsim = 1e4-1000;
     phitemp = phi(randperm(i));
+    disp(phitemp)
+    tic
     [b, binfo] = biMaxb(ustruct,phi);
     [b_noisy, ~, e] = add_noise(b,0.01);
     A = biMaxA(ubroadening, xinfo, binfo);
-    [~, alpha, delta, lambda] = NNHGS(A,b_noisy,L,nsim);
-    save(strcat('nangle',num2str(i),'.mat'),'alpha','delta','lambda','phitemp');
+    welford.keep = 1;
+    welford.nburnin = 1000;
+    [x, alpha, delta, lambda, info] = NNHGS(A,b_noisy,L,nsim, welford);
+    save(strcat('./nsim/nangle',num2str(i),'.mat'),'x', 'alpha','delta','lambda','info','phitemp');
+    toc
 end
