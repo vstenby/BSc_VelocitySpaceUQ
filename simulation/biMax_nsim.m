@@ -30,7 +30,7 @@ L = reguL(vparadim,vperpdim); %L'L is eq. (16) in Jacobsen 2016 Phys Control.
 %Observation angles
 phi = [10 20 40 70 85];
 
-for i=2:5
+for i=4:5
     nsim = 1e4-1000;
     phitemp = phi(randperm(i));
     disp(phitemp)

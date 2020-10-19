@@ -29,7 +29,7 @@ L = reguL(vparadim,vperpdim); %L'L is eq. (16) in Jacobsen 2016 Phys Control.
 
 %Observation angles
 phi = [60 80];
-thirdangle = [0:5:90];
+thirdangle = [55:5:90];
 
 for i=1:length(thirdangle)
     tic
