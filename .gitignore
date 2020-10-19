@@ -7,4 +7,6 @@ other/.DS_Store
 .DS_Store
 *.m~
 *.mat
+*.err
+*.out
 other/tomoanalyticV/.DS_Store
