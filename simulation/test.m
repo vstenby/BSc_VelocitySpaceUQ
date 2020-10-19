@@ -1,4 +1,6 @@
 %Simulation test.
 
-x = randn(100);
-save('x.mat','x')
+function test(n)
+    x = randn(n);
+    save(strcat(num2str(n),'x.mat'),'x')
+end
