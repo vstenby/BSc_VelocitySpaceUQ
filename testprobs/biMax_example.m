@@ -20,7 +20,7 @@ addpath(genpath('../../aux'))
 %Example 1 is a small scale problem, based on AnalyticTestCase.m
 %Example 2 is a bigger scale problem, based on biMaxSlowDown4Viktor.m
 
-example = 1;
+example = 2;
 
 %% 1) Setting up the problem
 switch example
@@ -41,7 +41,6 @@ switch example
 
         phi = [10 20 40 70 85];
         u   = [-5e6:1e5:5e6];
-        ubroadening = 1;
         
         [vpara, vperp, gridinfo] = construct_vgrid(vparamin,vparamax,vparadim,vperpmin,vperpmax,vperpdim);
         [x_true, xinfo] = biMaxx(vpara,vperp,Tpara,Tperp,vparadrift,options);
@@ -49,7 +48,7 @@ switch example
         
         [b, binfo] = biMaxb(u,phi,Tpara,Tperp,vparadrift,options);
         
-        A = biMaxA(ubroadening, xinfo, binfo);
+        A = transferMatrix(vpara,vperp,phi,u);
         
         %alpha values for 0th order Tikhonov and 1st order Tikhonov.
         alphavec = logspace(5, 15, 50);
@@ -71,17 +70,15 @@ switch example
         ustruct.Emax = 4e6;
         %Number of points per spectrum
         ustruct.udim = 200;
-        
-        %ubroadening is the spectral resolution 
-        %of the measurements divided by bin width u of the spectra.
-        ubroadening = 3; 
-        
+             
         %Observation angles
         phi=[10 20 40 70 85];
         
         [b, binfo] = biMaxb(ustruct,phi);
-
-        A = biMaxA(ubroadening, xinfo, binfo);
+        
+        u = construct_uvec(ustruct);
+        
+        A = transferMatrix(vpara,vperp,phi,u);
         
         %alpha values for 0th order Tikhonov and 1st order Tikhonov.
         alphavec = logspace(5, 15, 20);
@@ -97,10 +94,6 @@ end
 
 %This is for the 1st order Tikhonov.
 L = reguL(vparadim,vperpdim); %L'L is eq. (16) in Jacobsen 2016 Phys Control.
-
-%L has to be square for UQ.
-%Tried to outcomment this.
-%L = chol(L'*L);
 
 %% 2) Reconstruction
 x0th = GPCG_TikhNN(A, b_noisy, alphavec);    %0th order Tikhonov
@@ -134,25 +127,18 @@ showDistribution(x1st(:,idx1),gridinfo); title('Optimal 1st order Tikhonov');
 
 %% 3) Uncertainty Quantification
 % 3a) UQ for the 0th order Tikhonov formulation
-%[xUQ0th, del0th, lam0th, alph0th] = NNHGS_UQ(A, b_noisy, 0, [], nsim);
+%[xUQ0th, del0th, lam0th, alph0th] = NNHGS(A, b_noisy, 0, [], nsim);
 
 % 3b) UQ for the 1st order Tikhonov formulation
-[xUQ1st, alph1st, del1st, lam1st, info] = NNHGS(A, b_noisy, L, nsim);
+welford.nburnin = 10;
+[xUQ1st, alph1st, del1st, lam1st, info] = NNHGS(A, b_noisy, L, nsim, welford);
 
-%%
-%Analyze the two simulations.
+%% Analysis
+%Analyze simulations
+clc
 analyze_sim(xUQ1st, alph1st, del1st, lam1st, gridinfo);
 
-%disp(' ');
-%input('Press enter to analyze next simulation ')
-%disp(' ');
+%Find the reconstruction with mean alpha.
+xalpha = GPCG_TikhNN(A,b_noisy,mean(alph1st),L);
 
-%analyze_sim(nsim, xUQ1st, alph1st, del1st, lam1st, gridinfo);
 
-%% Comments and code chunks
-
-%Normalize by the measurement uncertainty
-%[Shat, Ahat] = measurement_normalization(S_noisy,A,s);
-
-% Normalize with the 2-norm
-%[S2hat, A2hat, factor] = numeric_normalization(Shat, Ahat);

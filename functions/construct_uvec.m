@@ -2,6 +2,10 @@ function uvec = construct_uvec(ustruct, Mi)
 %Auxil function to construct uvec.
 
 Qe = 1.6021917e-19; %Elementary charge
+if nargin < 2
+    Mp = 1.6726e-27;    %Mass of proton
+    Mi = 4*Mp;
+end
 
 umin = []; umax = []; du = []; udim = [];
 

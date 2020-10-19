@@ -7,7 +7,7 @@ elseif nargin == 5
     %Welford options 
     if ~isstruct(welford), error('Welford should be a struct'); end
     welford.welford = 1;
-    if ~isfield(welford,'keep'), error('Trimming should be specified with Welford'), end
+    if ~isfield(welford,'keep'), welford.keep = 1, end
     if ~isfield(welford,'nburnin'), error('nburnin should be specified with Welford'), end
 else
     error('Wrong number of arguments')

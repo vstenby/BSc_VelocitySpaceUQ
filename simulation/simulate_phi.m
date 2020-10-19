@@ -19,10 +19,6 @@ function simulate_phi(idx)
     %Number of points per spectrum
     ustruct.udim = 200;
 
-    %ubroadening is the spectral resolution 
-    %of the measurements divided by bin width u of the spectra.
-    ubroadening = 3; 
-
     %L regularization matrix
     L = reguL(vparadim,vperpdim); %L'L is eq. (16) in Jacobsen 2016 Phys Control.
 
@@ -32,16 +28,13 @@ function simulate_phi(idx)
     
     %Set the third angle.
     phi(3) = thirdangle(idx);
-
+    
     [b, binfo] = biMaxb(ustruct,phi);
     [b_noisy, ~, e] = add_noise(b,0.01);
-
-    A = biMaxA(ubroadening, xinfo, binfo);
-
-    welford.keep = 1;           %No trimming
     
-    %welford.nburnin = 1;
-    %nsim = 10;
+    u = construct_uvec(ustruct);
+    A = transferMatrix(vpara,vperp,phi,u);
+
     welford.nburnin = 500;     %.5k burnin
     nsim = 5000;                %5k samples
 
@@ -50,7 +43,7 @@ function simulate_phi(idx)
     %Save all of the current variables to a .mat file
     foldername = angle_to_string(phi);
     save(strcat('./sim_angles2/', angle_to_string(phi), '.mat'))
-
+    
     %Collect the angles in a string
     function s = angle_to_string(phi)
         s = sprintf('phi_%d_%d_%d',phi(1),phi(2),phi(3));
