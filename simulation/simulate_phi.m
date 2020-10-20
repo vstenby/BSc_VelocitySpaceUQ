@@ -20,8 +20,12 @@ function simulate_phi(idx)
     ustruct.udim = 200;
 
     %L regularization matrix
-    L = reguL(vparadim,vperpdim); %L'L is eq. (16) in Jacobsen 2016 Phys Control.
-
+    %0th order
+    L = []; 
+    %1st order
+    %L = reguL(vparadim,vperpdim); %L'L is eq. (16) in Jacobsen 2016 Phys Control.
+    
+    
     %Observation angles
     phi = [60 80];
     thirdangle = [0:5:90];
