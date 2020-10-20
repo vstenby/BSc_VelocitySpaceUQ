@@ -20,8 +20,8 @@
 #BSUB -N
 ### -- Specify the output and error file. %J is the job-id %I is the job-array index --
 ### -- -o and -e mean append, -oo and -eo mean overwrite --
-#BSUB -o ./sim_angles2/Output_%J_%I.out
-#BSUB -e ./sim_angles2/Error_%J_%I.err
+#BSUB -o ./sim_angles_0th/Output_%J_%I.out
+#BSUB -e ./sim_angles_0th/Error_%J_%I.err
 
 # here follow the commands you want to execute
 # Program_name_and_options

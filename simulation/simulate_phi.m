@@ -46,7 +46,7 @@ function simulate_phi(idx)
 
     %Save all of the current variables to a .mat file
     foldername = angle_to_string(phi);
-    save(strcat('./sim_angles2/', angle_to_string(phi), '.mat'))
+    save(strcat('./sim_angles_0th/', angle_to_string(phi), '.mat'))
     
     %Collect the angles in a string
     function s = angle_to_string(phi)
