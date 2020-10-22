@@ -30,7 +30,9 @@ phi=[10 20 40 70 85];
 
 [b, binfo] = biMaxb(ustruct,phi);
 
-A = biMaxA(ubroadening, xinfo, binfo);
+u = construct_uvec(ustruct);
+
+A = transferMatrix(vpara,vperp,phi,u);
 
 %alpha values for 0th order Tikhonov and 1st order Tikhonov.
 alphavec = logspace(5, 15, 20);
@@ -41,7 +43,6 @@ alphavec = logspace(5, 15, 20);
 %This is for the 1st order Tikhonov.
 L = reguL(vparadim,vperpdim); %L'L is eq. (16) in Jacobsen 2016 Phys Control.
 
-
 alpha = alphavec(1);
 
 %%
@@ -51,7 +52,35 @@ xJohn  = GPCG_TikhNN(A,b_noisy,alpha,L);
 % Use in mosekopt
 %[r,resp] = mosekopt('minimize', 'lsqnonneg', param);
 
-xmosek = mosek_TikhNN(A,b_noisy,alpha,L);
+%%
+[m,n] = size(A);
+
+%%
+%xmosek = mosek_TikhNN(A,b_noisy,alpha,L);
+
+param.MSK_IPAR_PRESOLVE_LINDEP_USE = 'MSK_OFF';
+param.MSK_IPAR_INTPNT_BASIS = 'MSK_BI_NEVER';
+
+prob.c = [zeros(n,1); 1];
+prob.a = sparse([A_IC',  ones(m-s,1);
+                 A_IC', -ones(m-s,1);
+                 A_I' ,  zeros(s, 1)  ]);
+prob.blc = [zeros(m-s,1); -inf*ones(m-s,1); rhsI];
+prob.buc = [inf*ones(m-s,1); zeros(m-s,1);  rhsI];
+prob.blx = [];
+prob.bux = [];
+
+echo_level = 3;
+
+cmd = 'minimize';
+cmd = sprintf('%s echo(%i)',cmd,echo_level);
+
+[r,res] = mosekopt(cmd,prob,param);
+
+
+
+
+
 
 %% Objective function for the two
 
