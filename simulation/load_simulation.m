@@ -1,4 +1,4 @@
-function [x, xtrue, alpha, delta, lambda, gridinfo] = load_simulation(folder,drop)
+function [x, x_true, alpha, delta, lambda, phi, gridinfo, filename] = load_simulation(folder, drop)
 % Input: 
 %   folder
 %   skip
@@ -22,6 +22,7 @@ files = {files.name};
 files = sort_files(files);
 
 %Main for-loop loading the files.
+if ~iscell(drop); drop = {drop}; end;
 files = drop_files(files,drop); %Drop certain simulations
 nfiles = length(files);
 
@@ -29,36 +30,41 @@ nfiles = length(files);
 load(strcat(folder,'/',files{1}));
 
 %Assume that these are the same across simulations.
-xtrueout    = x_true;
+
 gridinfoout = gridinfo;
 
 %Allocate these before looping.
-xout        = zeros([size(x),nfiles]);
-alphaout    = zeros([size(alpha,1),nfiles]);
-deltaout    = zeros([size(delta,1),nfiles]);
-lambdaout   = zeros([size(lambda,1),nfiles]);
-phiout      = cell(nfiles,1); %cell since number of angles might vary. 
+x_trueout   = cell(nfiles,1);
+xout        = cell(nfiles,1);
+alphaout    = cell(nfiles,1);
+deltaout    = cell(nfiles,1);
+lambdaout   = cell(nfiles,1);
+phiout      = cell(nfiles,1); %cell since number of angles might vary.
+filename    = cell(nfiles,1);
+gridinfoout = cell(1,nfiles);
 
 clear x alpha alphavec delta lambda
 
 for i=1:length(files)
-   load(strcat(folder,'/',files{i}),'x','alpha','delta','lambda','phi');
-   xout(:,:,i) = x;
-   alphaout(:,i) = alpha;
-   deltaout(:,i) = delta;
-   lambdaout(:,i) = lambda;
+   load(strcat(folder,'/',files{i}),'x','alpha','delta','lambda','phi', 'x_true', 'gridinfo');
+   x_trueout{i} = x_true;
+   xout{i} = x;
+   alphaout{i} = alpha;
+   deltaout{i} = delta;
+   lambdaout{i} = lambda;
    phiout{i} = phi;
+   filename{i} = files{i};
+   gridinfoout{i} = gridinfo;
 end
 
 %Rename the output variables
-x = xout;
-%alpha = alphaout;
-delta = deltaout;
-lambda = lambdaout;
-phi = phiout;
-xtrue = x_true;
-
-
+x        = xout;
+alpha    = alphaout;
+delta    = deltaout;
+lambda   = lambdaout;
+phi      = phiout;
+x_true   = x_trueout;
+gridinfo = gridinfoout;
 end
 
 function files_dropped = drop_files(files, drop)
