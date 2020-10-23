@@ -1,4 +1,4 @@
-function [x, x_true, alpha, delta, lambda, phi, gridinfo, filename] = load_simulation(folder, drop)
+function [x, x_true, alpha, delta, lambda, u, phi, gridinfo, filename] = load_simulation(folder, drop)
 % Input: 
 %   folder
 %   skip
@@ -39,6 +39,7 @@ xout        = cell(nfiles,1);
 alphaout    = cell(nfiles,1);
 deltaout    = cell(nfiles,1);
 lambdaout   = cell(nfiles,1);
+uout        = cell(nfiles,1);
 phiout      = cell(nfiles,1); %cell since number of angles might vary.
 filename    = cell(nfiles,1);
 gridinfoout = cell(1,nfiles);
@@ -46,12 +47,13 @@ gridinfoout = cell(1,nfiles);
 clear x alpha alphavec delta lambda
 
 for i=1:length(files)
-   load(strcat(folder,'/',files{i}),'x','alpha','delta','lambda','phi', 'x_true', 'gridinfo');
+   load(strcat(folder,'/',files{i}),'x','alpha','delta','lambda','phi', 'x_true', 'u', 'gridinfo');
    x_trueout{i} = x_true;
    xout{i} = x;
    alphaout{i} = alpha;
    deltaout{i} = delta;
    lambdaout{i} = lambda;
+   uout{i} = u;
    phiout{i} = phi;
    filename{i} = files{i};
    gridinfoout{i} = gridinfo;
@@ -65,6 +67,7 @@ lambda   = lambdaout;
 phi      = phiout;
 x_true   = x_trueout;
 gridinfo = gridinfoout;
+u = uout;
 end
 
 function files_dropped = drop_files(files, drop)

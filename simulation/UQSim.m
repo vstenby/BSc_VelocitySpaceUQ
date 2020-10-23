@@ -8,10 +8,10 @@ classdef UQSim
       alpha      %delta-chains
       delta      %delta-chains
       lambda     %lambda-chains
+      u          %u vector
       phi        %observation angles
       gridinfo   %gridinfo
       filename   %filename
-      A          %Cell struct of A matrices.
    end
    
    methods 
@@ -29,9 +29,10 @@ classdef UQSim
                       if ~iscell(keep1stvar); keep1stvar = {keep1stvar}; end
               end
            end
- 
+           
+           if ~exist('drop','var'), drop = {''}; end
            obj.foldername = foldername;  
-           [x, x_true, alpha, delta, lambda, phi, gridinfo, filename] = load_simulation(foldername, drop);
+           [x, x_true, alpha, delta, lambda, u, phi, gridinfo, filename] = load_simulation(foldername, drop);
            obj.x_true = x_true{1};     %We assume that the true solution is the same across simulations.
            
            %Reshape x
@@ -49,6 +50,7 @@ classdef UQSim
            obj.gridinfo = gridinfo{1}; %We assume that all of the simulations are done on the same grid.
            obj.filename = filename;
            obj.phi = phi;
+           obj.u = u;
            
            
        end
