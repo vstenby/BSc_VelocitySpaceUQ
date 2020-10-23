@@ -18,7 +18,6 @@ load(strcat(foldername,'/',files{1}),'x_true', 'phi', 'alpha', 'phi');
 nsimulations = length(files);
 nsamps = size(alpha,1);
 
-
 phi_sim    = zeros(nsimulations,length(phi));
 pgeweke    = zeros(nsimulations,1);
 alpha_sim  = zeros(nsamps,nsimulations);
@@ -37,6 +36,13 @@ for i=1:length(files)
     phi_sim(i,:) = phi;
 end
 disp('Done loading')
+
+discard_phi = [45, 60, 80, 90];
+discard_idx = any(phi_sim(:,3) == discard_phi,2);
+nsimulations = nsimulations-length(discard_phi);
+
+[pgeweke, alpha_sim, delta_sim, lambda_sim, x_sim, phi_sim] = remove_phi(discard_idx, pgeweke, alpha_sim, delta_sim, lambda_sim, x_sim, phi_sim);
+
 
 %% Show the different reconstructions.
 clim_mu  = [min(reshape(x_sim(:,1,:),1,[])) ...
@@ -153,4 +159,13 @@ function s = phi2str(phi)
 s = sprintf('%02d %02d %02d', phi(1), phi(2), phi(3));
 end
 
+function [p_new, alph_new, del_new, lam_sim, x_new, phi_new] = remove_phi(discard_idx, pgeweke, alpha_sim, delta_sim, lambda_sim, x_sim, phi_sim)
+bool = ~discard_idx;
+p_new = pgeweke(bool);
+alph_new = alpha_sim(:,bool);
+del_new = delta_sim(:,bool);
+lam_sim = lambda_sim(:,bool);
+x_new = x_sim(:,:,bool);
+phi_new = phi_sim(bool,:);
+end
 
