@@ -3,8 +3,7 @@ clear, clc, close all
 addpath(genpath('../functions'))
 addpath(genpath('../../aux'))
 
-sim0th = UQSim('sim_angles_0th');
-sim1st = UQSim('sim_angles_1st');
+sim0th = load('sim0th.mat'); sim0th = sim0th.sim0th;
 
 %% Initial inspection of 0th order 
 figure;
