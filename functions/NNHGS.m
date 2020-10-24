@@ -64,7 +64,7 @@ LtL = L'*L;
 %Hyperpriors
 a0 = 1; 
 t0 = 0.0001; 
-a1 = 1; 
+a1 = 1;
 t1 = 0.0001;
 
 %Index for Welford's Online Algorithm
