@@ -21,17 +21,16 @@ function simulate_phi(idx)
 
     %L regularization matrix
     %0th order
-    L = []; 
+    %L = []; 
     %1st order
-    %L = reguL(vparadim,vperpdim); %L'L is eq. (16) in Jacobsen 2016 Phys Control.
-    
+    L = reguL(vparadim,vperpdim); %L'L is eq. (16) in Jacobsen 2016 Phys Control.
     
     %Observation angles
-    phi = [60 80];
-    thirdangle = [0:5:90];
+    phi = [60 80 20];
+    fourthangle = [0:5:90];
     
     %Set the third angle.
-    phi(3) = thirdangle(idx);
+    phi(4) = fourthangle(idx);
     
     [b, binfo] = biMaxb(ustruct,phi);
     [b_noisy, ~, e] = add_noise(b,0.01);
@@ -46,10 +45,10 @@ function simulate_phi(idx)
 
     %Save all of the current variables to a .mat file
     foldername = angle_to_string(phi);
-    save(strcat('./sim_angles_0th/', angle_to_string(phi), '.mat'))
+    save(strcat('./sim_4angles_1st/', angle_to_string(phi), '.mat'))
     
     %Collect the angles in a string
     function s = angle_to_string(phi)
-        s = sprintf('phi_%d_%d_%d',phi(1),phi(2),phi(3));
+        s = sprintf('phi_%d_%d_%d_%d',phi(1),phi(2),phi(3),phi(4));
     end
 end

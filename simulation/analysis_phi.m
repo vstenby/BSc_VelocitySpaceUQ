@@ -3,7 +3,43 @@ clear, clc, close all
 addpath(genpath('../functions'))
 addpath(genpath('../../aux'))
 
-sim0th = load('sim0th.mat'); sim0th = sim0th.sim0th;
+sim0th = UQSim('sim_angles_0th');
+sim1st = UQSim('sim_angles_1st');
+
+%% Find the relative error
+
+phi_0th = zeros(17,1);
+for i=1:17
+   phi_0th(i) = sim0th.phi{i}(3); 
+end
+
+phi_1st = zeros(18,1);
+for i=1:18
+   phi_1st(i) = sim1st.phi{i}(3); 
+end
+
+%Get the means from each
+x_mean_0th = reshape(sim0th.x(:,1,:),[5000 17]);
+x_mean_1st = reshape(sim1st.x(:,1,:),[5000 18]);
+
+relerr_0th = relerr(sim0th.x_true,x_mean_0th);
+relerr_1st = relerr(sim1st.x_true,x_mean_1st);
+
+simxticks = cell(18,1);
+for i=1:18
+   simxticks{i} = num2str(sim1st.phi{i}); 
+end
+figure
+plot(relerr_0th, '-or')
+hold on
+plot(relerr_1st, '-ob')
+xticks([1:18])
+xticklabels(simxticks)
+xtickangle(90)
+ylabel('Relative error')
+legend('0th','1st')
+title('Angles vs Relative error : Posterior mean')
+
 
 %% Initial inspection of 0th order 
 figure;
