@@ -10,7 +10,7 @@ Uncertainty Quantification for Velocity Space Tomography
 .. toctree::
    :maxdepth: 2
 
-   purpose.rst
+   about.rst
    functions.rst
    examples.rst
    credit.rst
