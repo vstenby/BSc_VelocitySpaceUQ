@@ -1,7 +1,7 @@
 
 
-Dependencies
-============
+Functions
+=========
 
 Required
 --------
