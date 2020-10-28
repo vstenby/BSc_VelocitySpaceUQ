@@ -47,7 +47,6 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'Velocity Space UQ'
-copyright = '2020, Viktor Stenby'
 author = 'Viktor Stenby'
 
 # The version info for the project you're documenting, acts as replacement for
