@@ -11,5 +11,6 @@ MATLAB Toolbox for Uncertainty Quantification for Velocity Space Tomography
    :caption: Contents:
 
    about
+   installation
    functions
    examples
