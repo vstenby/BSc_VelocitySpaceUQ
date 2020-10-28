@@ -1,12 +1,4 @@
-
-
-Purpose
+About
 =======
-
-I now wish to write a purpose about this project.
-
-
-Zipf's law
-----------
-
-Hello, this is perfect. This is my law.
+This code was written as a part of my bachelor thesis, "Uncertainty Quantification for Velocity Tomography"
+during the fall of 2020.

@@ -11,7 +11,7 @@ Uncertainty Quantification for Velocity Space Tomography
    :maxdepth: 2
 
    purpose.rst
-   dependencies.rst
-   usage.rst
+   functions.rst
+   examples.rst
    credit.rst
    exercises.rst

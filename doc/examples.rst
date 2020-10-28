@@ -1,7 +1,7 @@
 
 
-Usage
-=====
+Examples
+========
 
 
 How to clone the code
