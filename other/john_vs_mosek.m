@@ -105,7 +105,12 @@ f2(xmosek)
 
 %%
 clc
+[M,N] = size(A);
+alpha = alphavec(1);
 
+L = reguL(vparadim,vperpdim); %L'L is eq. (16) in Jacobsen 2016 Phys Control.
+%L = speye(N);
+%alpha = 0;
 C = [A ; sqrt(alpha)*L];
 d = [b ; zeros(size(L,1),1)];
 

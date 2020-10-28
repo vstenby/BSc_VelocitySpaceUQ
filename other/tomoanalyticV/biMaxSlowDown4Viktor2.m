@@ -265,6 +265,15 @@ Teff=Tperp*(sin(phi/180*pi))^2+Tpara*(cos(phi/180*pi))^2;
 
 gubiMaxanalytic=ni*(Mi/(2*pi*Teff*Qe))^0.5*exp(-(Mi*(uvec-vparadrift*cos(phi/180*pi)).^2)/(2*Teff*Qe));
 gubiMaxnumvpavpe=Wvpavpe*reshape(fvpavpe2DbiMaxDrift,vparadim*vperpdim,1);
+
+%% Per Christian plot
+
+plot(gubiMaxanalytic)
+hold on
+plot(gubiMaxnumvpavpe)
+
+
+%%
 gubiMaxnumvpavpetransformed=Wvpavpe*reshape(fvpavpe2DtransformedbiMax,vparadim*vperpdim,1);
 gubiMaxnumEp=WEp*reshape(fEpbiMaxDrift,Edim*pdim,1);
 gubiMaxnumEptransformed=WEp*reshape(fEptransformedbiMax,Edim*pdim,1);

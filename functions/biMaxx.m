@@ -17,10 +17,12 @@ Qe = 1.6021917e-19; %Elementary charge
 %A bit of code duplication, perhaps ask Jakob how to do this better.
 if nargin == 2
     %Tpara, Tperp, vparadrift and options not given.
-    Tpara=200e3; %eV
-    Tperp=200e3; %eV
-    vparadrift = 5e6; 
-    options.Mi = 4*Mp;
+    %Tpara=200e3; %eV
+    %Tperp=200e3; %eV
+    Tpara=20; %keV
+    Tperp=20; %keV
+    vparadrift = 5e5; 
+    options.Mi = 2*Mp;
     options.ne = 1e19;   
 elseif nargin == 4
     %vparadrift and options not given.
@@ -46,11 +48,16 @@ ne = options.ne;
 Mi = options.Mi;
 
 %Thermal velocities
-vthpara=sqrt(2*Tpara*Qe/Mi);
-vthperp=sqrt(2*Tperp*Qe/Mi);
+%vthpara=sqrt(2*Tpara*Qe/Mi);
+%vthperp=sqrt(2*Tperp*Qe/Mi);
+vthpara=sqrt(2*Tpara*Qe*1000/Mi);
+vthperp=sqrt(2*Tperp*Qe*1000/Mi);
 
 %Equation 69.
 x = (2*ne*vperp)/(sqrt(pi)*vthpara*vthperp.^2) .* exp(-((vpara-vparadrift)/vthpara).^2-(vperp/vthperp).^2);
+%x3D=ne/(pi^(3/2)*vthpara*vthperp^2)*exp(-((vpara-vparadrift)/vthpara).^2-(vperp/vthperp).^2);
+%x = x3D.*(2*pi*vperp);
+
 
 if any(size(x) == 1)
     x = reshape(x, numel(x), x);

@@ -38,7 +38,6 @@ xalpha = zeros(n,length(alpha));
 
 
 for i = 1:length(alpha)
-   i
    switch L
        case 0
            GalphaL0=zeros(size(L0,2),1);

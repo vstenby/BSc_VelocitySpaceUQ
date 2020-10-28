@@ -16,6 +16,6 @@ D = @(n) spdiags([-ones(n,1) ones(n,1)],[-1 0],n+1,n);
 nx = nvpara;
 ny = nvperp;
 
-D = @(n) spdiags([-ones(n,1) ones(n,1)],[-1 0],n,n);
 L = [kron(D(ny), speye(nx)) ; kron(speye(ny),D(nx))];
+
 end

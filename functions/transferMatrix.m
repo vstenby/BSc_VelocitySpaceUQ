@@ -42,9 +42,15 @@ for phi_k=phi
         aik = real(aik);
         %Consider rewriting to increase speed.
         A(row_idx,:) = aik(:);
+        
+        %gamma1fine=acos((u_i-du/2-cos(phi_k/180*pi).*vpara)./(sin(phi_k/180*pi).*vperp));
+        %gamma2fine=acos((u_i+du/2-cos(phi_k/180*pi).*vpara)./(sin(phi_k/180*pi).*vperp));
+        %wvfine=real((gamma1fine-gamma2fine))/pi/du*dvpara*dvperp;
+        %A(row_idx,:) = wvfine(:);
         row_idx = row_idx + 1;
     end 
 end
 %Multiply A with the factors.
-A = 1/du * dvpara * dvperp * A;
+%A = 1/du * dvpara * dvperp * A;
+A = dvpara * dvperp * A;
 end

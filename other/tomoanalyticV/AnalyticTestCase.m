@@ -133,6 +133,8 @@ A = transfermatrixCTSfine;
 noiselevel=0.01;
 backgroundlevel=1*10^0;
 
+
+
 [S_noisy,e] = Generate_noisy_spectrum(transfermatrixCTSfine,fvpavpe2DbiMaxfine,noiselevel,backgroundlevel);
 
 
@@ -152,6 +154,12 @@ S_noisy_norm=S_noisy_norm';
 
 
 [xalpha,alpha] = TikhonovNonNeg(transfermatrixCTS,S_noisy_norm,vpara,vperp,1);
+
+
+%%
+
+
+
 
 %%
 figure(10); clf; hold on; box on;set(gca, 'Layer','top');

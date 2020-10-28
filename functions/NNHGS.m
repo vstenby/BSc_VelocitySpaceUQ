@@ -1,28 +1,56 @@
-function [x, alpha, delta, lambda, info] = NNHGS(A,b,L,n,welford)
+function [x, alpha, delta, lambda, info] = NNHGS(A,b,L,n,varargin)
 % Nonnegative Hierachical Gibbs Sampler
 
-if nargin <= 4
-    welford.welford = 0;
-elseif nargin == 5
-    %Welford options 
-    if ~isstruct(welford), error('Welford should be a struct'); end
-    welford.welford = 1;
-    if ~isfield(welford,'keep'), welford.keep = 1; end
-    if ~isfield(welford,'nburnin'), error('nburnin should be specified with Welford'), end
+%Set the default parameters for the NNHGS
+disp_waitbar = true;
+welford = false;
+keep = 1;
+solver  = 'lsqnonneg';
+
+%Scale our A
+scaling_factor = 1/max(A(:));
+A = A*scaling_factor;
+
+nvarargin = length(varargin);
+
+if mod(nvarargin,2) == 1
+    error('Odd nuber of extra arguments')
 else
-    error('Wrong number of arguments')
+    %Unpack varargin
+    for i=1:2:nvarargin
+       arg = varargin{i};
+       switch arg
+           case 'welford'
+               welford = varargin{i+1};
+               if ~islogical(welford)
+                   error('Welford should be logical')
+               end
+           case 'keep'
+               keep = varargin{i+1};
+           case 'nburnin'
+               nburnin = varargin{i+1};  
+           case 'solver'
+               solver = varargin{i+1};
+       end
+    end
 end
 
-if welford.welford
-    nidx = [1:welford.keep:n*welford.keep];
-    nidx = nidx + welford.nburnin;
+if ~welford && keep ~= 1
+   warning('Trimming has to be done manually if Welford is false') 
+end
+
+if welford
+    if ~exist('nburnin','var')
+        error("Burn-in should be specified with Welford's Algorithm")
+    end
+    %Calculate the number of 
+    nidx = [1:keep:n*keep];
+    nidx = nidx + nburnin;
     nsamps = nidx(end);
 else
     nsamps = n;
 end
-   
-%Perhaps make disp_waitbar an input to the function
-disp_waitbar = 1;
+
 
 %Allocate the delta, lambda and alpha
 del_sim  = zeros(nsamps,1);
@@ -35,7 +63,7 @@ if all(size(L) == 0)
    L = speye(N); 
 end
 
-if welford.welford
+if welford
     x = zeros(N,2);
 else
     x = zeros(N,nsamps);
@@ -45,10 +73,27 @@ if disp_waitbar
     f = waitbar(1/nsamps,'Finding initial xalpha');
 end
 
+%Calculate L'*L beforehand.
+LtL = L'*L;
+
 %Initial sample.
 alpha0 = 0; %This should be a parameter in the options as well.
 
-xtemp = GPCG_TikhNN(A,b,alpha0,L);
+switch solver
+    case '\'
+        xtemp = [A ; sqrt(alpha0)*L]\[b ; zeros(size(L,1),1)];
+    case 'lsqnonneg'
+        xtemp = lsqnonneg([A ; sqrt(alpha0)*L], [b ; zeros(size(L,1),1)]);
+    case 'GPCG'
+        x0 = zeros(N,1);    
+        B = @(x) (A'*(A*x)) + alpha0*LtL*x; 
+        rhs = A'*b;
+        %Should we play around with these solver settings?
+        xtemp = GPCG(B, rhs, x0, 50, 5, 20, 1e-6);
+    otherwise
+        error('Wrong solver specified.')
+end
+
 alph_temp = alpha0;
 lam_temp  = 1/norm(b(:)-A*xtemp(:))^2;
 del_temp  = alpha0*lam_temp;
@@ -58,9 +103,6 @@ alph_sim(1)    = alph_temp;
 lam_sim(1)     = lam_temp;
 del_sim(1)     = del_temp;
 
-%Calculate L'*L beforehand.
-LtL = L'*L;
-
 %Hyperpriors
 a0 = 1; 
 t0 = 0.0001; 
@@ -68,7 +110,7 @@ a1 = 1;
 t1 = 0.0001;
 
 %Index for Welford's Online Algorithm
-welford_i = 1;
+if welford, welford_i = 1; end
 
 for i=2:nsamps
    if disp_waitbar, waitbar(i/nsamps, f, 'Sampling...'), end
@@ -79,7 +121,6 @@ for i=2:nsamps
    
    %Note here that 1./ is because of the way MATLAB does gamrnd. 
    %Equation (58) and (59) in Dental CT
-   
    lam_temp  = gamrnd(a0 + M/2, 1./(t0+norm(Axtemp(:)-b(:))^2/2)); 
    del_temp  = gamrnd(a1 + N/2, 1./(t1+xtemp(:)'*LtLxtemp(:)/2)); 
    
@@ -92,26 +133,36 @@ for i=2:nsamps
    %Right hand side of (2.5) in BaHa20 divided with lambda.
    rhs = A'*bhat + alph_temp*L'*chat;
    
-   %LHS is divided with lambda.
-   B = @(x) (A' * (A*x)) + alph_temp*LtL*x;
-   
-   xtemp = GPCG(B, rhs, zeros(N,1), 50, 5, 20, 1e-6);
-   
+   switch solver
+       case '\'
+            B = (A'*A) + alph_temp*LtL;
+            xtemp = B\rhs;
+        case 'lsqnonneg'
+            B = (A'*A) + alph_temp*LtL;
+            xtemp = lsqnonneg(B,rhs);
+        case 'GPCG'
+            B = @(x) (A'*(A*x)) + alph_temp*LtL*x; 
+            xtemp = GPCG(B, rhs, x0, 50, 5, 20, 1e-6);
+       otherwise
+         error('Wrong solver specified.')
+   end
+
    %Perhaps Welford should be written into it's own function
-   if welford.welford
-       if (mod(i-welford.nburnin,welford.keep) || welford.keep == 1) == 1 && welford.nburnin < i
+   if welford
+       if (mod(i-nburnin,keep) || keep == 1) == 1 && nburnin < i
+           xwelford = xtemp*scaling_factor; %Properly scaled of x.
            %True if i = (nburnin+1)+keep*p, where p = 0, 1, ...
            if welford_i == 1
                %M1 and S1 has to be initialized as xtemp and 0.
-               Mk = xtemp; 
+               Mk = xwelford;
                Sk = zeros(size(xtemp));
            else
                Mprev = Mk; %M_{k-1}
                Sprev = Sk; %S_{k-1}
                %We use the recurrence formulas
                welford_i = welford_i + 1; %so that welford_i = 2 for 2nd sample, 3 for 3rd ...
-               Mk = Mprev + (xtemp - Mprev)/welford_i; 
-               Sk = Sprev + (xtemp - Mprev).*(xtemp - Mk);
+               Mk = Mprev + (xwelford - Mprev)/welford_i; 
+               Sk = Sprev + (xwelford - Mprev).*(xwelford - Mk);
            end
            welford_i = welford_i + 1;
        end
@@ -128,11 +179,11 @@ end
 %Saving to the info struct.
 info.n = n;
 
-if welford.welford
-    info.welford = 1;
+if welford
+    info.welford = welford;
     info.nsamps = nsamps;
-    info.nburnin = welford.nburnin;
-    info.keep = welford.keep;
+    info.nburnin = nburnin;
+    info.keep = keep;
     info.nidx = nidx';
     info.alpha = alph_sim;
     info.delta = del_sim;
@@ -144,16 +195,18 @@ if welford.welford
     lambda = lam_sim(info.nidx);
 else
     %Return all of them.
-    info.welford = 0;
+    info.welford = welford;
     info.nsamps = n;
     alpha = alph_sim;
     delta = del_sim;
     lambda = lam_sim;
 end
 
-if welford.welford
+if welford
     x(:,1) = Mk; %mean
     x(:,2) = (Sk/(welford_i-1)).^(1/2); %standard deviation
+else
+    x = x*scaling_factor;
 end
 
 if disp_waitbar, close(f), end
