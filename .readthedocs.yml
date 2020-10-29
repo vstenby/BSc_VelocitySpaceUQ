@@ -22,6 +22,6 @@ python:
   version: 3.7
   install:
     - method: pip
-    - -U sphinxcontrib-matlabdomain
+    - path: -U sphinxcontrib-matlabdomain
 #    - requirements: docs/requirements.txt
 
