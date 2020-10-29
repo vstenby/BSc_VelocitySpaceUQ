@@ -1,4 +1,7 @@
 Functions
 =========
 
-Here, we can see the functions.
+Nonnegative Tikhonov
+--------------------
+
+.. mat:autofunction:: functions.TikhNN

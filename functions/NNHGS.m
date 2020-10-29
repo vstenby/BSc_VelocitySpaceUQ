@@ -126,21 +126,27 @@ for i=2:nsamps
    
    alph_temp = del_temp/lam_temp;
    
-   %Generate bhat and chat.
-   bhat = mvnrnd(b,lam_temp^(-1)*speye(M))';
-   chat = mvnrnd(zeros(size(L,1),1),del_temp^(-1)*speye(size(L,1)))';
+   %Multivariate normal distribution vectors bhat and chat are generated.
+   %https://en.wikipedia.org/wiki/Multivariate_normal_distribution#Computational_methods
+   bhat = b + sqrt(lam_temp^(-1))*speye(M)*randn(M,1);
+   chat =     sqrt(del_temp^(-1))*speye(size(L,1))*randn(size(L,1),1);
    
-   %Right hand side of (2.5) in BaHa20 divided with lambda.
-   rhs = A'*bhat + alph_temp*L'*chat;
+   %bhat = mvnrnd(b,lam_temp^(-1)*speye(M))';
+   %chat = mvnrnd(zeros(size(L,1),1),del_temp^(-1)*speye(size(L,1)))';
    
    switch solver
        case '\'
-            B = (A'*A) + alph_temp*LtL;
-            xtemp = B\rhs;
+            %Solving (2.5) in BAHa. 
+            B = [sqrt(lam_temp)*A ; sqrt(del_temp)*L];
+            d = [sqrt(lam_temp)*bhat ; sqrt(del_temp)*chat];
+            xtemp = B\d;
         case 'lsqnonneg'
-            B = (A'*A) + alph_temp*LtL;
-            xtemp = lsqnonneg(B,rhs);
+            B = [sqrt(lam_temp)*A ; sqrt(del_temp)*L];
+            d = [sqrt(lam_temp)*bhat ; sqrt(del_temp)*chat];
+            xtemp = lsqnonneg(B,d);
         case 'GPCG'
+            %Right hand side of (2.5) in BaHa20 divided with lambda.
+            rhs = A'*bhat + alph_temp*L'*chat;
             B = @(x) (A'*(A*x)) + alph_temp*LtL*x; 
             xtemp = GPCG(B, rhs, x0, 50, 5, 20, 1e-6);
        otherwise

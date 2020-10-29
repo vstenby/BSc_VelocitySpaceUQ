@@ -1,10 +1,54 @@
 function [x, alpha, varargout] = TikhNN(A,b,alpha,L,varargin)
-% Nonnegative Tikhonov Solver.
+% Solves the Tikhonov problem formulated as:
+%   
+% :math:`\mathrm{x}_{\alpha} = \underset{x}{\min} \frac{1}{2} \left\| \mathrm{A} \mathrm{x}
+% - \mathrm{b} \right\|^2 + \frac{\alpha}{2} \|\mathrm{L}\mathrm{x}\|^2`
+% 
+% or equivalently
+%
+% :math:`\mathrm{x}_{\alpha} = \underset{x}{\min} \frac{1}{2} \left\| \begin{bmatrix} \mathrm{A} \\ \sqrt{\alpha} \, \mathrm{L}
+% \end{bmatrix} \mathrm{x} - \begin{bmatrix} \mathrm{b} \\ 0 \end{bmatrix}
+% \right\|^2`
+%
+%
+% Usage: 
+%    ``[x, alpha] = TikhNN(A,b,alpha)``
+%
+%    ``[x, alpha] = TikhNN(A,b,alpha,L)``
+%
+%    ``[x, alpha, relerr] = TikhNN(A,b,alpha,L,'relerr',true,'xtrue',xtrue)``
+%
+% Inputs:
+%    * **A**:               System matrix
+%
+%    * **b**:               Right hand side 
+%
+%    * **alpha**:           Regularization parameter
+%
+%    * **L**:               Regularization matrix
+%
+% Optional inputs:
+%    * **solver**:          String specifying the used solver. Either ``lsqnonneg`` (default) , ``GPCG`` or ``\``.
+%   
+%    * **scaling**:         Whether or not A should be scaled.
+%
+%    * **dispwaitbar**:     Whether or not to display waitbar if several alphas are passed. 
+%
+%    * **relerr**:          If ``true``, then relerr is returned as the third output.
+%
+%    * **xtrue**:           Used to calculate the relative error.
+%
+% Output:
+%    * **x**:               The Tikhonov solution for a given alpha.
+%
+%    * **alpha**:           Corresponding value of alpha.
+%
+%    * **relerr**:          Relative error
 
 [~,N] = size(A);
 
 %Default parameters
-solver = 'lsqnonneg'; solvers = {'GPCG','\','lsqnonneg'};
+solver = 'lsqnonneg'; solvers = {'GPCG','backslash','lsqnonneg'};
 scaling = true;
 nalpha = length(alpha);
 
