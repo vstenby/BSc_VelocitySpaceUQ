@@ -9,10 +9,24 @@ MATLAB Toolbox for Uncertainty Quantification for Velocity Space Tomography
 About
 =====
 
-This is the documentation for my MATLAB Toolbox for Uncertainty Quantification
-for Velocity Space Tomography.
+This is the documentation for the MATLAB Toolbox for Uncertainty Quantification for Velocity Space Tomography. 
+The code was written during the fall of 2020 as a part of my Bachelor project. 
 
-This toolbox was made as a part of my bachelor thesis during 2020.
+.. image:: images/cookies.png
+   :width: 400  
+   :align: center
+
+| **Author** 
+| Viktor Stenby Johansson
+
+| **Supervisors**
+| Per Christian Hansen
+| Yiqiu Dong
+| Jakob Sauer Jørgensen
+| Mirko Salewski
+
+.. image:: images/dtucompute.png
+   :width: 250
 
 .. toctree::
    :maxdepth: 2

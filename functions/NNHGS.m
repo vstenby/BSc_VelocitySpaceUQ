@@ -109,20 +109,7 @@ LtL = L'*L;
 %Initial sample.
 alpha0 = 0; %This should be a parameter in the options as well.
 
-switch solver
-    case '\'
-        xtemp = [A ; sqrt(alpha0)*L]\[b ; zeros(size(L,1),1)];
-    case 'lsqnonneg'
-        xtemp = lsqnonneg([A ; sqrt(alpha0)*L], [b ; zeros(size(L,1),1)]);
-    case 'GPCG'
-        x0 = zeros(N,1);    
-        B = @(x) (A'*(A*x)) + alpha0*LtL*x; 
-        rhs = A'*b;
-        %Should we play around with these solver settings?
-        xtemp = GPCG(B, rhs, x0, 50, 5, 20, 1e-6);
-    otherwise
-        error('Wrong solver specified.')
-end
+xtemp = TikhNN(A,b,alpha0,L,'solver',solver);
 
 alph_temp = alpha0;
 lam_temp  = 1/norm(b(:)-A*xtemp(:))^2;

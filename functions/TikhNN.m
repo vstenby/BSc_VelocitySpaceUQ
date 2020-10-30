@@ -63,6 +63,9 @@ solver = 'lsqnonneg'; solvers = {'GPCG','\','lsqnonneg'};
 scaling = true;
 return_relerr = false;
 
+%Check if mosek is installed correctly
+if ~check_mosek(), warning('mosek is not installed - consider changing solver.'), end
+
 nalpha = length(alpha);
 if nalpha~=1
     dispwaitbar = true;
