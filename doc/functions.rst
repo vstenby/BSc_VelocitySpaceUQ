@@ -1,46 +1,53 @@
 Functions
 =========
 
-Setting up the problem
+Fast Ion Distributions
 ----------------------
 
-bi-Maxwellian distribution
+Bi-Maxwellian Distribution
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. mat:autofunction:: functions.biMaxx
 
-Isotropic slowing-down distribution
+Isotropic Slowing-Down Distribution
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. mat:autofunction:: functions.isoSDx
+.. mat:autofunction functions.isoSDx
 
-Forward model matrix A
-^^^^^^^^^^^^^^^^^^^^^^
+Analytic Velocity Distributions
+-------------------------------
+
+Bi-Maxwellian Distribution
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. mat:autofunction functions.biMaxg
+
+Isotropic Slowing-Down Distribution
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. mat:autofunction functions.isoSDg
+
+Forward Model
+-------------
+
+Transfer Matrix
+^^^^^^^^^^^^^^^
 
 .. mat:autofunction:: functions.transferMatrix
 
-Analytic velocity distributions
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-.. mat:autofunction:: functions.isoSDg
-
-.. mat:autofunction:: functions.biMaxg
-
-
-
-Solvers
+Solvers 
 -------
 
-Nonnegative Tikhonov
-^^^^^^^^^^^^^^^^^^^^
+Nonnegative Tikhonov Solver
+^^^^^^^^^^^^^^^^^^^^^^^^^^^ 
 
 .. mat:autofunction:: functions.TikhNN
 
 Samplers
 --------
 
-Gibbs Sampler
-^^^^^^^^^^^^^
+Nonnegative Hierachical Gibbs Sampler
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. mat:autofunction:: functions.NNHGS
 
