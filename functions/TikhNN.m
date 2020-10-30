@@ -16,7 +16,7 @@ function [x, alpha, varargout] = TikhNN(A,b,alpha,L,varargin)
 %
 %    ``[x, alpha] = TikhNN(A,b,alpha,L)``
 %
-%    ``[x, alpha, relerr] = TikhNN(A,b,alpha,L,'relerr',true,'xtrue',xtrue)``
+%    ``[x, alpha, relerr] = TikhNN(A,b,alpha,L,'return_relerr',true,'xtrue',xtrue)``
 %
 % Inputs:
 %    * **A**:               System matrix
@@ -116,7 +116,6 @@ switch solver
             rhs = A'*b;
             x(:,i) = GPCG(B, rhs, x0, 50);
             %x(:,i) = GPCG(B, rhs, x0, 50, 5, 20, 1e-6);
-            %x(:,i) = GPCG(B, rhs, x0, 50, 5, 20, 1e-6); %We should be able to change this.
             if dispwaitbar, waitbar(i/nalpha, f, 'Solving...'), end
         end
     case 'lsqnonneg'

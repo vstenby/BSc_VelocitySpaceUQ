@@ -24,7 +24,7 @@ function [x, info] = isoSDx(vpara, vperp, varargin)
 %    * **ne**:                  Number of ions. Default : ``1e19``
 %
 % Output:
-%    * **x**:               The Tikhonov solution for a given alpha.
+%    * **x**:               The isotropic slowing-down distribution evaluated on the (vpara,vperp)-grid.
 %
 %    * **info**:            MATLAB struct containing all inputs (including optional inputs) above.
 

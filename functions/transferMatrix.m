@@ -67,7 +67,7 @@ A = dvpara * dvperp * A;
 
 %Generate warning based on size of A.
 mirko_ratio = size(A,2)/size(A,1);
-if (mirko_ratio > 1.3) && (mirko_ratio < 1.6)
+if (mirko_ratio >= 1.3) && (mirko_ratio <= 1.6)
    %We're good in terms of Mirko's gut feeling. 
 else
    warning('size(A,2)/size(A,1) = %.2f',round(mirko_ratio,2))
