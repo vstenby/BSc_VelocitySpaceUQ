@@ -20,12 +20,12 @@ Analytic Velocity Distributions
 Bi-Maxwellian Distribution
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. mat:autofunction functions.biMaxg
+.. mat:autofunction:: functions.biMaxg
 
 Isotropic Slowing-Down Distribution
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. mat:autofunction functions.isoSDg
+.. mat:autofunction:: functions.isoSDg
 
 Forward Model
 -------------
