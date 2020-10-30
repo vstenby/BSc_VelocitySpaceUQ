@@ -1,82 +1,73 @@
-function [b, info] = biMaxb(u, phi, Tpara, Tperp, vparadrift, options)
-% This function returns the analytical projections of the bi-Maxwellian
-% distribution function.
+function [g, info] = biMaxg(u,phi,varargin)
+% Fix this documentation.
 %
-% 
-% If not specified, these will be the default values:
-% Tpara = 200e3 eV
-% Tperp = 200e3 eV
-% vparadrift = 5e6
-% Mi = 4*(1.6726e-27)
-% ne = 1e19
+% Usage: 
+%    ``g = isoSDg(u)``
+%
+%    ``g = isoSDg(u,phi)``
+%
+%    ``[g, info] = isoSDg(u,phi,varargin)``
+%
+% Inputs:
+%    * **u**:               Write a description here.
+%
+%    * **phi**:             Observation angles.
+%
+% Optional inputs:
+%    * **Ecrit**:           Needs an explanation. Default : ``44*20000 eV``
+%   
+%    * **Ebirth**:          Needs an explanation. Default : ``3.5e6 eV``
+%   
+%    * **Ebirthwidth**:     Needs an explanation. Default : ``6e4``
+%
+%    * **Mi**:              Needs an explanation. Default : ``4*Mp``
+%
+%    * **ne**:              Number of ions. Default : ``1e19``
+%
+% Output:
+%    * **g**:               Velocity distribution
+%
+%    * **info**:            MATLAB struct containing all inputs (including optional inputs) above.
 
 %Physical constants
 Mp = 1.6726e-27;    %Mass of proton
 Qe = 1.6021917e-19; %Elementary charge
 
-%A bit of code duplication, perhaps ask Jakob how to do this better.
-if nargin == 2
-    %uvec phivec specified,
-    Tpara=200e3; %eV
-    Tperp=200e3; %eV
-    vparadrift = 5e6; 
-    options.Mi = 4*Mp;
-    options.ne = 1e19;  
-elseif nargin == 4
-    %tpara tperp specified
-    vparadrift = 5e6; 
-    options.Mi = 4*Mp;
-    options.ne = 1e19;  
-elseif nargin == 5
-    %vparadrift specified
-    options.Mi = 4*Mp;
-    options.ne = 1e19;  
-elseif nargin == 6
-    %All options given.
-    if ~isstruct(options), error('6th argument should be a struct'), end
-    if ~isfield(options,'Mi'), options.Mi = 4*Mp; end %Default if not specified.
-    if ~isfield(options,'ne'), options.ne = 1e19; end %Default if not specified.
-else
-    %Too many or too few inputs.
-    error('Wrong number of inputs')
-end
+% - - - - - - - - - - -  Optional inputs - - - - - - - - - - - 
+%Set default values for optional inputs.
+Tpara = 20; %eV
+Tperp = 20; %eV
+vparadrift = 5e5;
+Mi = 2*Mp;
+ne = 1e19;
 
-%Fetching other parameters from options.
-ne = options.ne;
-Mi = options.Mi;
+validvars = {'Tpara','Tperp','vparadrift','Mi','ne'};
+evals = varargin_to_eval(varargin,validvars);
+for i=1:length(evals); eval(evals{i}); end
+% - - - - - - - - - - -  Optional inputs - - - - - - - - - - - 
 
-%Make sure we get u as specified.
-if isstruct(u)
-    uvec = construct_uvec(u, Mi);
-else
-    %Assume u is a vector.
-    uvec = u;
-end
+g = [];
+n_points = length(u);
 
-b = [];
-n_points = length(uvec);
-phivec = phi;
-
-%Constructing b analytically for each phi.
-for i = 1:length(phivec)
-    phi = phivec(i);
-    Teff=Tperp*(sin(phi/180*pi))^2+Tpara*(cos(phi/180*pi))^2; %Equation (72), denoted Tu.
+%Constructing g analytically for each phi.
+for i = 1:length(phi)
+    phi_temp = phi(i);
+    Teff=(Tperp*1000)*(sin(phi_temp/180*pi))^2+(Tpara*1000)*(cos(phi_temp/180*pi))^2; %Equation (72), denoted Tu.
     
-    %We make length(uvec) points for each angle.
+    %We make length(u) points for each angle.
     idx1 = (i-1)*n_points + 1;
     idx2 = idx1+n_points - 1;
     
     %u_d is specified in Equation 73 but written inline here.
-    b(idx1 : idx2) = ne*(Mi/(2*pi*Teff*Qe))^0.5*exp(-(Mi*(uvec-vparadrift*cos(phi/180*pi)).^2)/(2*Teff*Qe)); %Equation (72)
+    g(idx1 : idx2) = ne*(Mi/(2*pi*Teff*Qe))^0.5*exp(-(Mi*(u-vparadrift*cos(phi_temp/180*pi)).^2)/(2*Teff*Qe)); %Equation (72)
 end
 
-%Return b as a column vector.
-b = b'; 
+%Return g as a column vector.
+g = g'; 
 
 %Saving the relevant parameters to the info structure.
-info.u = uvec;
-info.du = info.u(2)-info.u(1);
-info.phi = phivec;
+info.u = u;
+info.phi = phi;
 info.Tpara = Tpara;
 info.Tperp = Tperp;
 info.vparadrift = vparadrift;

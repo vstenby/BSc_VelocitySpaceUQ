@@ -19,6 +19,14 @@ Forward model matrix A
 
 .. mat:autofunction:: functions.transferMatrix
 
+Analytic velocity distributions
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. mat:autofunction:: functions.isoSDg
+
+.. mat:autofunction:: functions.biMaxg
+
+
 
 Solvers
 -------
@@ -40,7 +48,8 @@ Gibbs Sampler
 Auxilary functions
 ------------------
 
-.. mat:autofunction:: functions.construct_uvec
-
 .. mat:autofunction:: functions.construct_vgrid
 
+.. mat:autofunction:: functions.construct_uvec
+
+.. mat:autofunction:: functions.reguL
