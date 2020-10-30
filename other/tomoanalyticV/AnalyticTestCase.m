@@ -153,7 +153,14 @@ end
 S_noisy_norm=S_noisy_norm';
 
 
-[xalpha,alpha] = TikhonovNonNeg(transfermatrixCTS,S_noisy_norm,vpara,vperp,1);
+clc
+disp(vparadim)
+disp(vperpdim)
+disp(size(fvpavpe2DbiMax))
+
+%L = reguL2(n1,n2) d
+
+%[xalpha,alpha] = TikhonovNonNeg(transfermatrixCTS,S_noisy_norm,vpara,vperp,1);
 
 
 %%

@@ -1,59 +1,59 @@
-function [vpara, vperp, ginfo] = construct_vgrid(varargin)
-%   Construct a (vpara,vperp)-grid. 
+function [vpara, vperp, ginfo] = construct_vgrid(vparadim, vperpdim, varargin)
+% Function for constructing (vpara,vperp)-grid on which we can evaluate our
+% distribution functions.
 %
-%   Usage:
-%   [vpara, vperp, gridinfo] = construct_vgrid()
-%   [vpara, vperp, gridinfo] = construct_vgrid(vparadim, vperpdim)
-%   
-%   Multiple arguments can be given in the following way:
-%   construct_vgrid(vparadim,vperpdim, 'vperpmin', -1e8 ...)   
-%   where you can pass 'vparamin', 'vparamax', 'vperpmin' and 'vperpmax'
-%   as optional arguments.
+% Usage: 
+%    ``[vpara, vperp] = construct_vgrid(vparadim, vperpdim)``
 %
-%   Viktor Stenby Johansson, Fall 2020.
+%    ``[vpara, vperp, ginfo] = construct_vgrid(vparadim, vperpdim, varargin)`` 
+%
+% Inputs:
+%    * **vparadim**:        The dimensions in the parallel dimension.
+%
+%    * **vperpdim**:        The dimensions in the perpendicular dimension.
+%
+% Optional inputs:
+%    * **vparamin**:        Write description here.
+%
+%    * **vparamax**:        Write description here. 
+%
+%    * **vparadim**:        Write description here.
+%
+%    * **vperpmin**:        Write description here
+%
+%    * **vperpmax**:        Write description here.
+%
+%    * **vperpdim**:        Write description here.
+%
+% Output:
+%    * **vpara**:           Write description here.
+%
+%    * **vperp**:            Write description here.
+%
+%    * **ginfo**:            Write description here.
 
-%Default parameters.
-vparamin = -1.4e7;
-vparamax = 1.4e7;
-vparadim = 100;
-vperpmin = 1e5;
-vperpmax = 1.4e7;
-vperpdim = 50;
-    
+
 switch nargin
     case 0
-        vparadim = 100;         vperpdim = 50;
-        default_parameters = 1;
+        vparadim = 100; vperpdim = 50;
     case 1
-        vparadim = varargin{1}; vperpdim = 50;
-        default_parameters = 1;
-    case 2
-        vparadim = varargin{1}; vperpdim = varargin{2};
-    otherwise
-        vparadim = varargin{1}; vperpdim = varargin{2};
-        %Unpack the remaining varargin.
-        optargin  = {varargin{3:end}};
-        noptargin = length(optargin);
-        if mod(noptargin,2) == 1 
-            error('Wrong number of optional argin'); 
-        else
-            %Unpack the reamining argin.
-            for i=1:2:noptargin
-               arg = optargin{i};
-               switch arg
-                   case 'vparamin'
-                       vparamin = optargin{i+1};
-                   case 'vparamax'
-                       vparamax = optargin{i+1};
-                   case 'vperpmin'
-                       vperpmin = optargin{i+1};
-                   case 'vperpmax'
-                       vperpmax = optargin{i+1};
-                   otherwise
-                       error('Unrecognized varargin');
-               end
-            end 
-        end
+        vperpdim = 50;
+end
+% - - - - - - - - - - -  Optional inputs - - - - - - - - - - - 
+% Default values of optional inputs
+vparamin = -1.4e7;
+vparamax = 1.4e7;
+
+vperpmin = 1e5;
+vperpmax = 1.4e7;
+
+validvars = {'vparamin','vparamax','vperpmin','vperpmax'};
+evals = varargin_to_eval(varargin,validvars);
+for i=1:length(evals); eval(evals{i}); end
+% - - - - - - - - - - -  Optional inputs - - - - - - - - - - -
+
+if ~exist('vparadim','var') || ~exist('vperpdim','var')
+    error('vparadim or vperpdim is not defined.')
 end
 
 vpara_linspace = linspace(vparamin, vparamax, vparadim);

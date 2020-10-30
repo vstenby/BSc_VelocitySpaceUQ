@@ -1,21 +1,23 @@
 function L = reguL(varargin)
-%Make the regularization matrix L
-
-if nargin == 2
-    nvpara = varargin{1};
-    nvperp = varargin{2};
-else
-    gridinfo = varargin{1};
-    nvpara = length(gridinfo.vpara_ax);
-    nvperp = length(gridinfo.vperp_ax);
+%
+% 
+% 
+switch nargin
+    case 1
+        dim = varargin{1}; 
+        nrow = dim(1); ncol = dim(2);
+    case 2
+        nrow = varargin{1}; ncol = varargin{2};
+    otherwise
+        error('Wrong number of inputs')
 end
 
-I = @(n) speye(n);
-D = @(n) spdiags([-ones(n,1) ones(n,1)],[-1 0],n+1,n);
 
-nx = nvpara;
-ny = nvperp;
+%Constructs a regularization matrix L for a matrix X of dimensions m, n
 
-L = [kron(D(ny), speye(nx)) ; kron(speye(ny),D(nx))];
+I = @(d) speye(d);
+D = @(d) spdiags([zeros(d-1,1) -ones(d-1,1) ones(d-1,1)],-1:1,d-1,d);
+
+L = [kron(D(ncol), I(nrow)) ; kron(I(ncol),D(nrow))];
 
 end

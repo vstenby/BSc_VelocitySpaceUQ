@@ -1,5 +1,21 @@
 function A = transferMatrix(vpara, vperp, phi, u)
-%Constructing the transfer matrix A.
+% Constructs the forward-model matrix A.
+%
+% Usage: 
+%    ``A = transferMatrix(vpara, vperp, phi, u)`` 
+%
+% Inputs:
+%    * **vpara**:                   Add description.
+%
+%    * **vperp**:                   Add description.
+%
+%    * **phi**:                     Add description.
+%
+%    * **u**:                       Add description.
+%
+% Output:
+%    * **A**:               	    The forward model matrix A.
+
 M = length(phi)*length(u);
 N = numel(vpara); 
 A = zeros(M,N);
@@ -42,15 +58,19 @@ for phi_k=phi
         aik = real(aik);
         %Consider rewriting to increase speed.
         A(row_idx,:) = aik(:);
-        
-        %gamma1fine=acos((u_i-du/2-cos(phi_k/180*pi).*vpara)./(sin(phi_k/180*pi).*vperp));
-        %gamma2fine=acos((u_i+du/2-cos(phi_k/180*pi).*vpara)./(sin(phi_k/180*pi).*vperp));
-        %wvfine=real((gamma1fine-gamma2fine))/pi/du*dvpara*dvperp;
-        %A(row_idx,:) = wvfine(:);
         row_idx = row_idx + 1;
     end 
 end
 %Multiply A with the factors.
 %A = 1/du * dvpara * dvperp * A;
 A = dvpara * dvperp * A;
+
+%Generate warning based on size of A.
+mirko_ratio = size(A,2)/size(A,1);
+if (mirko_ratio > 1.3) && (mirko_ratio < 1.6)
+   %We're good in terms of Mirko's gut feeling. 
+else
+   warning('size(A,2)/size(A,1) = %.2f',round(mirko_ratio,2))
+end
+
 end

@@ -1,43 +1,73 @@
 function [x, alpha, delta, lambda, info] = NNHGS(A,b,L,n,varargin)
 % Nonnegative Hierachical Gibbs Sampler
+%
+% Usage: 
+%    ``[x, alpha] = NNHGS(A,b,L,n)`` 
+%
+%    ``[x, alpha, delta, lambda, info] = NNHGS(A,b,L,n,varargin)`` 
+%
+% Inputs:
+%    * **A**:                   The system matrix A.
+%
+%    * **b**:                   The right hand side.
+%
+%    * **L**:                   The regularization matrix. ``[]`` is interpreted as ``speye(N)``
+%
+%    * **n**:                   Number of samples to be generated.
+%
+% Optional inputs:
+%    * **disp_waitbar**:        Whether or not a waitbar should be displayed.
+%   
+%    * **welford**:             If Welford is ``true``, then Welford's Online Algorithm is used to return mean and standard deviation of the samples.
+%   
+%    * **nburnin**:             Samples to be generated before Welford's Algorithm starts. Only used if ``welford=true``. 
+%   
+%    * **keep**:                Which samples we should keep. Only used if ``welford=true``. Default value is 1, meaning that every sample is kept.
+%
+%    * **solver**:              Which solver is used. ``lsqnonneg`` is default, but ``GPCG`` or ``\`` can be set.
+%
+%    * **scaling**:             Whether or not A should be rescaled such that the largest element in A = 1. Default is ``true``.
+%
+% Output:
+%    * **x**:               	Samples drawn from the posterior
+%
+%    * **alpha**:               alpha-chain sampled from the posterior.
+%
+%    * **delta**:               delta-chain sampled from the posterior.
+%
+%    * **lambda**:              lambda-chain sampled from the posterior.
+%
+%    * **info**:                MATLAB struct containing all sorts of information.
 
+% - - - - - - - - - - -  Optional inputs - - - - - - - - - - - 
 %Set the default parameters for the NNHGS
 disp_waitbar = true;
 welford = false;
 keep = 1;
 solver  = 'lsqnonneg';
+scaling = true;
+
+%Unpack the varargin and evaluate.
+validvars = {'disp_waitbar','welford','keep','solver','scaling','nburnin'};
+evals = varargin_to_eval(varargin,validvars);
+for i=1:length(evals); eval(evals{i}); end
+
+if ~islogical(welford), error('Welford should be logical'), end
+if ~welford && keep ~= 1
+   warning('Trimming has to be done manually if Welford is false.') 
+end
+
+if ~islogical(scaling), error('Scaling should be logical'), end
+% - - - - - - - - - - -  Optional inputs - - - - - - - - - - - 
 
 %Scale our A
-scaling_factor = 1/max(A(:));
-A = A*scaling_factor;
-
-nvarargin = length(varargin);
-
-if mod(nvarargin,2) == 1
-    error('Odd nuber of extra arguments')
+if scaling
+    scaling_factor = 1/max(A(:));
 else
-    %Unpack varargin
-    for i=1:2:nvarargin
-       arg = varargin{i};
-       switch arg
-           case 'welford'
-               welford = varargin{i+1};
-               if ~islogical(welford)
-                   error('Welford should be logical')
-               end
-           case 'keep'
-               keep = varargin{i+1};
-           case 'nburnin'
-               nburnin = varargin{i+1};  
-           case 'solver'
-               solver = varargin{i+1};
-       end
-    end
+    scaling_factor = 1;
 end
 
-if ~welford && keep ~= 1
-   warning('Trimming has to be done manually if Welford is false') 
-end
+A = A*scaling_factor;
 
 if welford
     if ~exist('nburnin','var')
@@ -48,9 +78,9 @@ if welford
     nidx = nidx + nburnin;
     nsamps = nidx(end);
 else
+    nidx = 1:n;
     nsamps = n;
 end
-
 
 %Allocate the delta, lambda and alpha
 del_sim  = zeros(nsamps,1);
@@ -130,13 +160,9 @@ for i=2:nsamps
    %https://en.wikipedia.org/wiki/Multivariate_normal_distribution#Computational_methods
    bhat = b + sqrt(lam_temp^(-1))*speye(M)*randn(M,1);
    chat =     sqrt(del_temp^(-1))*speye(size(L,1))*randn(size(L,1),1);
-   
-   %bhat = mvnrnd(b,lam_temp^(-1)*speye(M))';
-   %chat = mvnrnd(zeros(size(L,1),1),del_temp^(-1)*speye(size(L,1)))';
-   
+      
    switch solver
        case '\'
-            %Solving (2.5) in BAHa. 
             B = [sqrt(lam_temp)*A ; sqrt(del_temp)*L];
             d = [sqrt(lam_temp)*bhat ; sqrt(del_temp)*chat];
             xtemp = B\d;
@@ -183,26 +209,23 @@ for i=2:nsamps
 end
 
 %Saving to the info struct.
+info.welford = welford;
 info.n = n;
+info.nsamps = nsamps;
+info.nburnin = nburnin;
+info.keep = keep;
+info.nidx = nidx';
+info.alpha = alph_sim;
+info.delta = del_sim;
+info.lambda = lam_sim;
 
-if welford
-    info.welford = welford;
-    info.nsamps = nsamps;
-    info.nburnin = nburnin;
-    info.keep = keep;
-    info.nidx = nidx';
-    info.alpha = alph_sim;
-    info.delta = del_sim;
-    info.lambda = lam_sim;
-    
+if welford   
     %Remove the burnin and trim the three chains.
     alpha = alph_sim(info.nidx);
     delta = del_sim(info.nidx);
     lambda = lam_sim(info.nidx);
 else
     %Return all of them.
-    info.welford = welford;
-    info.nsamps = n;
     alpha = alph_sim;
     delta = del_sim;
     lambda = lam_sim;

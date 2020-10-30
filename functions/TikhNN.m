@@ -34,7 +34,7 @@ function [x, alpha, varargout] = TikhNN(A,b,alpha,L,varargin)
 %
 %    * **dispwaitbar**:     Whether or not to display waitbar if several alphas are passed. 
 %
-%    * **relerr**:          If ``true``, then relerr is returned as the third output.
+%    * **return_relerr**:   If ``true``, then relerr is returned as the third output.
 %
 %    * **xtrue**:           Used to calculate the relative error.
 %
@@ -47,20 +47,6 @@ function [x, alpha, varargout] = TikhNN(A,b,alpha,L,varargin)
 
 [~,N] = size(A);
 
-%Default parameters
-solver = 'lsqnonneg'; solvers = {'GPCG','backslash','lsqnonneg'};
-scaling = true;
-nalpha = length(alpha);
-
-%Set index for varargout.
-varargout_idx = 1;
-
-if nalpha~=1
-    dispwaitbar = true;
-else
-    dispwaitbar = false;
-end
-
 %Make sure we deal with L.
 if nargin <= 3
     L = speye(N); 
@@ -68,37 +54,40 @@ elseif isempty(L)
     L = speye(N);
 end
 
-nvarargin = length(varargin);
-if mod(nvarargin,2) == 1, error('Odd number of varargin.'); end
+%Set index for varargout.
+varargout_idx = 1;
 
-for i=1:2:nvarargin
-   switch varargin{i}
-       case 'solver'
-         solver = varargin{i+1};
-         if ~any(strcmpi(solver,solvers)), error('Invalid solver.'), end
-       case 'scaling'
-         scaling = varargin{i+1};
-         if ~islogical(scaling), error('Scaling should be either true or false.'), end
-       case 'waitbar'
-         dispwaitbar = varargin{i+1};
-         if ~islogical(dispwaitbar), error('Waitbar should either be true or false.'), end
-       case 'relerr'
-         return_relerr = varargin{i+1};
-         if ~islogical(return_relerr), error('Relative error should be either true or false.'), end
-       case 'x_true'
-         x_true = varargin{i+1};
-       otherwise
-         error('Wrong varargin.');
-   end
+% - - - - - - - - - - -  Optional inputs - - - - - - - - - - - 
+%Set default values for optional parameters.
+solver = 'lsqnonneg'; solvers = {'GPCG','\','lsqnonneg'};
+scaling = true;
+return_relerr = false;
+
+nalpha = length(alpha);
+if nalpha~=1
+    dispwaitbar = true;
+else
+    dispwaitbar = false;
 end
 
+%Unpack the varargin and evaluate.
+validvars = {'return_relerr','scaling','solver','x_true'};
+evals = varargin_to_eval(varargin,validvars);
+for i=1:length(evals); eval(evals{i}); end
+
+
+if ~any(strcmpi(solver,solvers)), error('Invalid solver.'), end
+if ~islogical(scaling), error('Scaling should be either true or false.'), end
+if ~islogical(dispwaitbar), error('Waitbar should either be true or false.'), end
+if ~islogical(return_relerr), error('Relative error should be either true or false.'), end
+    
 %Make sure that we either have both or none
-if exist('return_relerr','var') && ~exist('x_true','var')
+if return_relerr && ~exist('x_true','var')
     error("It's hard to return the relative error without the true solution")
-elseif ~exist('return_relerr','var') && exist('x_true','var')
+elseif ~return_relerr && exist('x_true','var')
     warning('x_true given but not used.')
 end
-
+% - - - - - - - - - - -  Optional inputs - - - - - - - - - - - 
 
 if dispwaitbar
    f = waitbar(0, 'Solving...');
@@ -123,7 +112,6 @@ switch solver
         LtL = L'*L; %Precompute LtL for speed.
         x0 = zeros(N,1); 
         for i=1:nalpha
-            disp(alpha(i))
             B   = @(x) (A'*(A*x)) + alpha(i)*LtL*x; 
             rhs = A'*b;
             x(:,i) = GPCG(B, rhs, x0, 50);
@@ -152,10 +140,9 @@ x = x*scaling_factor;
 if dispwaitbar, close(f), end
 
 %Return the relative error.
-if exist('return_relerr','var')
+if return_relerr
     x_true = reshape(x_true,numel(x_true),1); %Reshape x_true if it isn't a vector.
     varargout{varargout_idx} = relerr(x_true,x); 
     varargout_idx = varargout_idx + 1;
 end
-
 end

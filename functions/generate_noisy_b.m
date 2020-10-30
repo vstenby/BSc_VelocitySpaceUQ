@@ -1,17 +1,37 @@
-function [b, e] = generate_noisy_b(A, x, noise_level, background_level)
-% [b, e] = generate_noisy_b(A,x,noise_level,background_level)
+function [b, e] = generate_noisy_b(A, x, varargin)
+% Generates a noisy right hand side.
 %
-% This function creates a noisy b
+% Usage: 
+%    ``[b, e] = generate_noisy_b(A, x)``
+%
+%    ``[b, e] = generate_noisy_b(A, x, varargin)``
+%
+% Inputs:
+%    * **A**:                System matrix
+%
+%    * **x**:                True solution
+%
+% Optional inputs:
+%    * **noise_level**:      Noise level
+%
+%    * **background_level**: Background level for the noise.
+%
+% Output:
+%    * **b**:                Write some description here.
+%
+%    * **e**:                Write some description here.
 
 x = x(:);
 
-switch nargin
-    case 2
-        noise_level      = 0.01;
-        background_level = 1;
-    case 3
-        background_level = 1;
-end
+% - - - - - - - - - - -  Optional inputs - - - - - - - - - - - 
+%Set default values for optional parameters.
+noise_level = 0.01;
+background_level = 1;
+%Unpack the varargin and evaluate.
+validvars = {'noise_level','background_level'};
+evals = varargin_to_eval(varargin,validvars);
+for i=1:length(evals); eval(evals{i}); end
+% - - - - - - - - - - -  Optional inputs - - - - - - - - - - - 
 
 background_errorlevel = sqrt(background_level);
 
