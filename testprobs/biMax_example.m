@@ -1,144 +1,88 @@
-%% BiMax example
-%
-%  This demo consists of the following three parts:
-%
-%  1) Setting up the problem.
-%
-%  2) Reconstruction
-%     - with 0th and 1st order Tikhonov
-%
-%  3) Uncertainty Quantification
-%     - with 0th and 1st order Tikhonov
-
-%Clear workspace, console etc.
+%% Third time's the charm...
 clear, clc, close all
 
-%Load the neccesary functions
+%set the grids. dvfine for computation of spectra, dv for inversion
+%(vpara,vperp) grid
+vparamax=4e6;
+vparamin=-4e6;
+vperpmin=1e4;
+vperpmax=4e6;
+
+%Observation angles
+phi=[10 20 40 70 85];
+
+%Add the dependencies
 addpath(genpath('../functions'))
 addpath(genpath('../../aux'))
 
-%Example 1 is a small scale problem, based on AnalyticTestCase.m
-%Example 2 is a bigger scale problem, based on biMaxSlowDown4Viktor.m
+[vparafine, vperpfine, ginfofine] = construct_vgrid(100,50,'vparamax',vparamax,'vparamin',vparamin,'vperpmin',vperpmin,'vperpmax',vperpmax);
+[vpara, vperp, ginfo] = construct_vgrid(40,20,'vperpmin',vperpmin,'vperpmax',vperpmax,'vparamin',vparamin,'vparamax',vparamax);
 
-example = 2;
+xtrue = biMaxx(vpara,vperp);
+xfine = biMaxx(vparafine, vperpfine); %Basically the same now.
+showDistribution(xfine,ginfofine)
 
-%% 1) Setting up the problem
-switch example
-    case 1
-        vparamin = -4e6;
-        vparamax = 4e6;
-        vparadim = 40;
-        
-        vperpmin = 1e4;
-        vperpmax = 4e6;
-        vperpdim = 20;
-        
-        Tpara = 2e4;
-        Tperp = 2e4;
-        vparadrift = 5e5;
-        
-        options.Mi = 2*1.6726e-27;
+u = construct_uvec('umin', [], 'umax', 5*1e6, 'du', 1e5); %Basically the same.
 
-        phi = [10 20 40 70 85];
-        u   = [-5e6:1e5:5e6];
-        
-        [vpara, vperp, gridinfo] = construct_vgrid(vparamin,vparamax,vparadim,vperpmin,vperpmax,vperpdim);
-        [x_true, xinfo] = biMaxx(vpara,vperp,Tpara,Tperp,vparadrift,options);
-        x_true = x_true(:);
-        
-        [b, binfo] = biMaxb(u,phi,Tpara,Tperp,vparadrift,options);
-        
-        A = transferMatrix(vpara,vperp,phi,u);
-        
-        %alpha values for 0th order Tikhonov and 1st order Tikhonov.
-        alphavec = logspace(5, 15, 50);
-        
-        %Number of simulations for UQ.
-        nsim = 500;
-    case 2
-        %Construct the default grid
-        [vpara, vperp, gridinfo] = construct_vgrid();
-        vparadim = length(gridinfo.vpara_ax);
-        vperpdim = length(gridinfo.vperp_ax);
+Afine = transferMatrix(vparafine,vperpfine,phi,u); %1/du * Afine and you get the transfermatrixCTSfine.
+A = transferMatrix(vpara,vperp,phi,u); %1/du * A and you get tranfermatrixCTS.
 
-        %Evaluate the bi-Maxwellian on this grid with default values.
-        [x_true, xinfo] = biMaxx(vpara, vperp); x_true = x_true(:);
+[b, e] = generate_noisy_b(Afine,xfine); 
+[A, b] = error_normalization(A,b,e);
 
-        %Construct the analytic projection.
-        %Boundaries of the (E,p)-space
-        ustruct.Emin = 10e3;
-        ustruct.Emax = 4e6;
-        %Number of points per spectrum
-        ustruct.udim = 200;
-             
-        %Observation angles
-        phi=[10 20 40 70 85];
-        
-        [b, binfo] = biMaxb(ustruct,phi);
-        
-        u = construct_uvec(ustruct);
-        
-        A = transferMatrix(vpara,vperp,phi,u);
-        
-        %alpha values for 0th order Tikhonov and 1st order Tikhonov.
-        alphavec = logspace(5, 15, 20);
-        
-        %Number of simulations for UQ.
-        nsim = 100;
-    otherwise
-        error('Wrong example.')
-end
+alpha = logspace(-10,1,200);
+L = reguL(20,40);
 
-%Add noise to b.
-[b_noisy, ~, e] = add_noise(b,0.01);
+[~, ~, r0th] = TikhNN(A, b, alpha, [], 'relerr', true, 'x_true', xtrue);
+[~, ~, r1st] = TikhNN(A, b, alpha,  L, 'relerr', true, 'x_true', xtrue);
 
-%This is for the 1st order Tikhonov.
-L = reguL(vparadim,vperpdim); %L'L is eq. (16) in Jacobsen 2016 Phys Control.
+[xNNHGS0, alphasim0] = NNHGS(A,b,[],100,'solver','GPCG','welford',true,'nburnin',250);
+[xNNHGS1, alphasim1] = NNHGS(A,b,L,100,'solver','GPCG','welford',true,'nburnin',250);
 
-%% 2) Reconstruction
-x0th = GPCG_TikhNN(A, b_noisy, alphavec);    %0th order Tikhonov
-x1st = GPCG_TikhNN(A, b_noisy, alphavec, L); %1st order Tikhonov
-
-%Show the relative error as a function of alpha.
-[r0, idx0] = relerr(x_true, x0th);
-[r1, idx1] = relerr(x_true, x1st);
-
-semilogx(alphavec,r0, 'r--')
+figure
+subplot(4,3,[1,4,7,10])
+semilogx(alpha,r0th, 'r-')
 hold on
-semilogx(alphavec,r1, 'b--')
+semilogx(alpha,r1st, 'b-')
+legend('0th','1st', 'AutoUpdate', 'off');
+
+
+[minr0,idx0] = min(r0th); optalpha_0th = alpha(idx0);
+[minr1,idx1] = min(r1st); optalpha_1st = alpha(idx1);
+
 hold on
+plot(optalpha_0th, minr0,'r.','MarkerSize',15);  xlabel('\alpha','FontSize',15)
+plot(optalpha_1st, minr1,'b.','MarkerSize',15);
+qalpha0 = quantile(alphasim0,[0 0.25 0.5 0.75 1]);
+xline(qalpha0(1),'r-.','LineWidth',3,'alpha',0.2);
+xline(qalpha0(2),'r-','LineWidth',3,'alpha',0.2);
+xline(qalpha0(3),'r-','LineWidth',3,'alpha',0.9);
+xline(qalpha0(4),'r-','LineWidth',3,'alpha',0.2);
+xline(qalpha0(5),'r-.','LineWidth',3,'alpha',0.2);
 
-%Plot the mininums
-plot(alphavec(idx0),r0(idx0), 'r.', 'MarkerSize',15)
-plot(alphavec(idx1),r1(idx1), 'b.', 'MarkerSize',15)
-xlabel('\alpha','Fontsize',15)
-ylabel('Relative error')
-legend('0th order Tikhonov', '1st order Tikhonov')
-
-%Plot the best reconstructions along with the true solution.
-figure
-showDistribution(x_true,gridinfo); title('True solution');
-
-figure
-showDistribution(x0th(:,idx0),gridinfo); title('Optimal 0th order Tikhonov');
-
-figure
-showDistribution(x1st(:,idx1),gridinfo); title('Optimal 1st order Tikhonov');
-
-%% 3) Uncertainty Quantification
-% 3a) UQ for the 0th order Tikhonov formulation
-%[xUQ0th, del0th, lam0th, alph0th] = NNHGS(A, b_noisy, 0, [], nsim);
-
-% 3b) UQ for the 1st order Tikhonov formulation
-welford.nburnin = 10;
-[xUQ1st, alph1st, del1st, lam1st, info] = NNHGS(A, b_noisy, L, nsim, welford);
-
-%% Analysis
-%Analyze simulations
-clc
-analyze_sim(xUQ1st, alph1st, del1st, lam1st, gridinfo);
-
-%Find the reconstruction with mean alpha.
-xalpha = GPCG_TikhNN(A,b_noisy,mean(alph1st),L);
+qalpha1 = quantile(alphasim1,[0 0.25 0.5 0.75 1]);
+xline(qalpha1(1),'b-.','LineWidth',3,'alpha',0.2);
+xline(qalpha1(2),'b-','LineWidth',3,'alpha',0.2);
+xline(qalpha1(3),'b-','LineWidth',3,'alpha',0.9);
+xline(qalpha1(4),'b-','LineWidth',3,'alpha',0.2);
+xline(qalpha1(5),'b-.','LineWidth',3,'alpha',0.2);
 
 
+legend('show')
+subplot(4,3,[2 3])
+showDistribution(xtrue,ginfo); title('True solution')
+
+subplot(4,3,5)
+showDistribution(xNNHGS0(:,1),ginfo); title('Posterior mean (0th order)')
+subplot(4,3,8)
+xsamplealpha0 = TikhNN(A,b,optalpha_0th);
+showDistribution(xsamplealpha0,ginfo); title('Reconstruction with mean alpha (0th order)')
+subplot(4,3,11)
+showDistribution(xNNHGS0(:,2),ginfo); title('Standard deviation (0th order)')
+
+subplot(4,3,6)
+showDistribution(xNNHGS1(:,1),ginfo); title('Posterior mean (1st order)')
+subplot(4,3,9)
+showDistribution(xNNHGS1(:,1),ginfo); title('Reconstruction with mean alpha (1st order)')
+subplot(4,3,12)
+showDistribution(xNNHGS1(:,2),ginfo); title('Standard deviation (1st order)')
