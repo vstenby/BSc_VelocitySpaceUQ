@@ -117,8 +117,8 @@ switch solver
         for i=1:nalpha
             B   = @(x) (A'*(A*x)) + alpha(i)*LtL*x; 
             rhs = A'*b;
-            x(:,i) = GPCG(B, rhs, x0, 50);
-            %x(:,i) = GPCG(B, rhs, x0, 50, 5, 20, 1e-6);
+            %x(:,i) = GPCG(B, rhs, x0, 50);
+            x(:,i) = GPCG(B, rhs, x0, 50, 5, 20, 1e-6);
             if dispwaitbar, waitbar(i/nalpha, f, 'Solving...'), end
         end
     case 'lsqnonneg'
