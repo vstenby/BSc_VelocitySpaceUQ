@@ -78,7 +78,7 @@ caxis_mu  = [min([xtrue(:) ; xNNHGS0(:,1) ; xNNHGS1(:,1)]), ...
 caxis_std = [min([xNNHGS0(:,2) ; xNNHGS1(:,2)]), ...
              max([xNNHGS0(:,2) ; xNNHGS1(:,2)])];
    
-%Plots
+%% Plots
 figure
 subplot(4,3,[1,4,7,10])
 semilogx(alpha_relerr,r0th, 'r-')
