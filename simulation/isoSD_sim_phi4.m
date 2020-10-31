@@ -1,5 +1,10 @@
 %% Isotropic Slowing Down Distribution Simulation (Simulate the 3rd angle)
 function isoSD_sim_phi4(sim_idx)
+
+    %Add dependencies to path.
+    addpath(genpath('../functions'))
+    addpath(genpath('../../aux'))
+    
     % - - - - - - - - - - Simulation setup  - - - - - - - - - - - - - - - -
     % In this simulation, the first two observation angles are 60 and 80,
     % and the last one is in the range 1 to 90.

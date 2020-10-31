@@ -1,5 +1,10 @@
 %% Bi-Maxwellian Distribution Simulation (RHS)
 function biMax_sim_rhs(sim_idx)
+
+    %Add dependencies to path.
+    addpath(genpath('../functions'))
+    addpath(genpath('../../aux'))
+    
     % - - - - - - - - - - Simulation setup  - - - - - - - - - - - - - - - -
     % In this simulation, we investigate the different right hand sides.
     %

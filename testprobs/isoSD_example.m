@@ -1,5 +1,10 @@
 %% Isotropic Slowing Down Distribution example.
 clear, clc, close all
+
+%Add dependencies to path.
+addpath(genpath('../functions'))
+addpath(genpath('../../aux'))
+
 rhs = 3;
 
 %Parameters for the (vpara,vperp)-grid.
