@@ -1,4 +1,4 @@
-%% Bi-Maxwellian Distribution Simulation (Simulate the 3rd angle)
+%% Bi-Maxwellian Distribution Simulation (Simulate the 4th angle)
 function biMax_sim_phi4(sim_idx)
 
     %Add dependencies to path.
@@ -94,6 +94,6 @@ function biMax_sim_phi4(sim_idx)
     caxis_std = [min([xNNHGS0(:,2) ; xNNHGS1(:,2)]), ...
                  max([xNNHGS0(:,2) ; xNNHGS1(:,2)])];
              
-    outputpath = sprintf('./biMax_sim_phi4/phi4_60_80_20_%02d.mat',phi(3));
+    outputpath = sprintf('./biMax_sim_phi4/phi4_60_80_20_%02d.mat',phi(4));
     save(outputpath)
 end
