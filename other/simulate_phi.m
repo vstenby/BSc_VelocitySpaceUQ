@@ -41,8 +41,7 @@ function simulate_phi(idx)
     welford.nburnin = 500;     %.5k burnin
     nsim = 5000;                %5k samples
 
-    [x, alpha, delta, lambda, info] = NNHGS(A,b_noisy,L,nsim,welford);
-
+    
     %Save all of the current variables to a .mat file
     foldername = angle_to_string(phi);
     save(strcat('./sim_4angles_1st/', angle_to_string(phi), '.mat'))

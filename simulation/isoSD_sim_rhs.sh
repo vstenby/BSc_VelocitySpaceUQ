@@ -1,7 +1,7 @@
 #!/bin/sh
 # embedded options to bsub - start with #BSUB
 ### -- set the job Name AND the job array --
-#BSUB -J SimulatePhi[1-19]
+#BSUB -J isoSD_sim_rhs[1-3]
 ### -- specify queue --
 #BSUB -q hpc
 ### -- ask for number of cores (default: 1) --
@@ -20,10 +20,10 @@
 #BSUB -N
 ### -- Specify the output and error file. %J is the job-id %I is the job-array index --
 ### -- -o and -e mean append, -oo and -eo mean overwrite --
-#BSUB -o ./sim_angles_0th/Output_%J_%I.out
-#BSUB -e ./sim_angles_0th/Error_%J_%I.err
+#BSUB -o ./isoSD_sim_rhs/Output_%J_%I.out
+#BSUB -e ./isoSD_sim_rhs/Error_%J_%I.err
 
 # here follow the commands you want to execute
 # Program_name_and_options
 
-matlab -nodisplay -r 'simulate_phi($LSB_JOBINDEX)' -logfile testOut
+matlab -nodisplay -r 'isoSD_sim_rhs($LSB_JOBINDEX)' -logfile testOut
