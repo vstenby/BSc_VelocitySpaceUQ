@@ -2,7 +2,7 @@ clear, clc, close all
 
 %Download the files DTUs servers.
 if ~isfolder('biMax_sim_phi3')
-    system('scp -r s174483@transfer.gbar.dtu.dk:~/Desktop/DTU/BSc/BSc_VelocitySpaceUQ/simulation/biMax_sim_phi3 biMax_sim_phi3');
+    HPCDownload('biMax_sim_phi3','biMax_sim_phi3','s174483');
 end
 
 %Add dependencies to path.
@@ -15,3 +15,4 @@ files = {dir('biMax_sim_phi3/*.mat').name};
 
 phi_analysis_table(files)
 phi_analysis_plot(files)
+
