@@ -39,44 +39,49 @@ L = reguL(vperpdim, vparadim);
 %A vector of alphas for finding the optimal regularization parameter.
 alpha_relerr = logspace(-9,-4,20);
 
-
-%%
-rmpath(genpath('../aux'))
-disp(check_mosek())
-tic
-[~, ~, r0_lsqlin_matlab] = TikhNN(A, b, alpha_relerr, [], 'return_relerr', true, 'x_true', xtrue);
-[~, ~, r1_lsqlin_matlab] = TikhNN(A, b, alpha_relerr,  L, 'return_relerr', true, 'x_true', xtrue);
-toc
-
-
-addpath(genpath('../aux'))
-disp(check_mosek())
+if ~check_mosek()
+    addpath(genpath('../../aux'))
+    if ~check_mosek(), error('mosek not loaded'), end
+end
+    
+fprintf('Starting 0th order mosek lsqlin, ')
 tic
 [~, ~, r0_lsqlin_mosek] = TikhNN(A, b, alpha_relerr, [], 'return_relerr', true, 'x_true', xtrue);
+fprintf('done in %f seconds.\n',toc)
+
+fprintf('Starting 1st order mosek lsqlin, ')
+tic
 [~, ~, r1_lsqlin_mosek] = TikhNN(A, b, alpha_relerr,  L, 'return_relerr', true, 'x_true', xtrue);
-toc
+fprintf('done in %f seconds.\n',toc)
 
-figure
-semilogx(alpha_relerr,r0_lsqlin_matlab, 'b-')
+fprintf('Starting 0th order mosek lsqnonneg, ')
+tic
+[~, ~, r0_lsqnonneg_mosek] = TikhNN(A, b, alpha_relerr, [], 'return_relerr', true, 'x_true', xtrue, 'solver', 'lsqnonneg');
+fprintf('done in %f seconds.\n',toc)
+
+fprintf('Starting 1st order mosek lsqnonneg, ')
+tic
+[~, ~, r1_lsqnonneg_mosek] = TikhNN(A, b, alpha_relerr,  L, 'return_relerr', true, 'x_true', xtrue, 'solver', 'lsqnonneg');
+fprintf('done in %f seconds.\n',toc)
+
+
+rmpath(genpath('../../aux')); if check_mosek(), error('Unavailable to remove mosek'), end
+
+fprintf('Starting 0th order MATLAB lsqlin, ')
+tic
+[~, ~, r0_lsqlin_matlab] = TikhNN(A, b, alpha_relerr, [], 'return_relerr', true, 'x_true', xtrue);
+fprintf('done in %f seconds.\n',toc)
+
+fprintf('Starting 1st order MATLAB lsqlin, ')
+tic
+[~, ~, r1_lsqlin_matlab] = TikhNN(A, b, alpha_relerr,  L, 'return_relerr', true, 'x_true', xtrue);
+fprintf('done in %f seconds.\n',toc)
+
+%% Plot the relative errors
+semilogx(r0_lsqlin_matlab, 'b-')
 hold on
-semilogx(alpha_relerr,r1_lsqlin_matlab, 'b--')
-hold on
-semilogx(alpha_relerr,r0_lsqlin_mosek, 'r.')
-hold on
-semilogx(alpha_relerr,r1_lsqlin_mosek, 'r-.')
-
-%%
-xlsqlin = NNHGS(A,b,L,100,'welfordsalgorithm',true,'nburnin',10);
-xlsqnonneg = NNHGS(A,b,L,100,'welfordsalgorithm',true,'nburnin',10);
-
-%%
-figure
-subplot(1,2,1); showDistribution(xlsqlin(:,1),ginfo)
-subplot(1,2,2); showDistribution(xlsqnonneg(:,1),ginfo)
-
-figure
-subplot(1,2,1); showDistribution(xlsqlin(:,2),ginfo)
-subplot(1,2,2); showDistribution(xlsqnonneg(:,2),ginfo)
-
-
-
+semilogx(r1_lsqlin_matlab, 'b-.')
+semilogx(r0_lsqlin_mosek,'r--')
+semilogx(r1_lsqlin_mosek,'r--')
+semilogx(r0_lsqnonneg_mosek,'g.')
+semilogx(r1_lsqnonneg_mosek,'g.')
