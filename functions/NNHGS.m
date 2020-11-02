@@ -1,4 +1,4 @@
-function [x, alpha, delta, lambda, info] = NNHGS(A,b,L,n,varargin)
+function [x, alpha, delta, lambda, info, xtest] = NNHGS(A,b,L,n,varargin)
 % Nonnegative Hierachical Gibbs Sampler
 %
 % Usage: 
@@ -44,7 +44,7 @@ function [x, alpha, delta, lambda, info] = NNHGS(A,b,L,n,varargin)
 disp_waitbar = true;
 welford = false;
 keep = 1;
-solver  = 'lsqnonneg';
+solver  = 'lsqlin';
 scaling = true;
 
 %Unpack the varargin and evaluate.
@@ -59,6 +59,11 @@ end
 
 if ~islogical(scaling), error('Scaling should be logical'), end
 % - - - - - - - - - - -  Optional inputs - - - - - - - - - - - 
+
+if ~check_mosek() && strcmpi(solver,'lsqnonneg')
+   warning('mosek is not installed, switching default solver to lsqlin.') 
+   solver = 'lsqlin';
+end
 
 %Scale our A
 if scaling
@@ -80,6 +85,7 @@ if welford
 else
     nidx = 1:n;
     nsamps = n;
+    nburnin = 0;
 end
 
 %Allocate the delta, lambda and alpha
@@ -88,6 +94,14 @@ lam_sim  = zeros(nsamps,1);
 alph_sim  = zeros(nsamps,1);
 
 [M,N] = size(A);
+
+%Lower bound for lsqlin.
+lb = zeros(N,1);
+
+if strcmpi(solver,'lsqlin')
+    opts = optimset('display','off'); 
+end
+
 
 if all(size(L) == 0)
    L = speye(N); 
@@ -128,7 +142,7 @@ t1 = 0.0001;
 
 %Index for Welford's Online Algorithm
 if welford, welford_i = 1; end
-
+xtest = [];
 for i=2:nsamps
    if disp_waitbar, waitbar(i/nsamps, f, 'Sampling...'), end
    
@@ -157,17 +171,22 @@ for i=2:nsamps
             B = [sqrt(lam_temp)*A ; sqrt(del_temp)*L];
             d = [sqrt(lam_temp)*bhat ; sqrt(del_temp)*chat];
             xtemp = lsqnonneg(B,d);
-        case 'GPCG'
+       case 'lsqlin'
+            B = [sqrt(lam_temp)*A ; sqrt(del_temp)*L];
+            d = [sqrt(lam_temp)*bhat ; sqrt(del_temp)*chat];
+            xtemp = lsqlin(B,d,[],[],[],[],lb,[],zeros(N,1),opts);
+        %case 'GPCG'
             %Right hand side of (2.5) in BaHa20 divided with lambda.
-            rhs = A'*bhat + alph_temp*L'*chat;
-            B = @(x) (A'*(A*x)) + alph_temp*LtL*x; 
-            xtemp = GPCG(B, rhs, x0, 50, 5, 20, 1e-6);
+        %    rhs = A'*bhat + alph_temp*L'*chat;
+        %    B = @(x) (A'*(A*x)) + alph_temp*LtL*x; 
+        %    xtemp = GPCG(B, rhs, x0, 50, 5, 20, 1e-6);
        otherwise
          error('Wrong solver specified.')
    end
 
    %Perhaps Welford should be written into it's own function
    if welford
+       xtest = [xtest xtemp];
        if (mod(i-nburnin,keep) || keep == 1) == 1 && nburnin < i
            xwelford = xtemp*scaling_factor; %Properly scaled of x.
            %True if i = (nburnin+1)+keep*p, where p = 0, 1, ...
@@ -221,6 +240,7 @@ end
 if welford
     x(:,1) = Mk; %mean
     x(:,2) = (Sk/(welford_i-1)).^(1/2); %standard deviation
+    xtest = xtest*scaling_factor;
 else
     x = x*scaling_factor;
 end
