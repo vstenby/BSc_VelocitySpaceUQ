@@ -13,6 +13,9 @@ addpath('biMax_sim_phi3')
 
 files = {dir('biMax_sim_phi3/*.mat').name}; 
 
+%% Construct the analysis tables
 phi_analysis_table(files)
+
+%% Show the different plots
 phi_analysis_plot(files)
 

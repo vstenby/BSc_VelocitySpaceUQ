@@ -1,4 +1,4 @@
-function [x, alpha, delta, lambda, info, xtest] = NNHGS(A,b,L,n,varargin)
+function [x, alpha, delta, lambda, info] = NNHGS(A,b,L,n,varargin)
 % Nonnegative Hierachical Gibbs Sampler
 %
 % Usage: 
@@ -18,7 +18,7 @@ function [x, alpha, delta, lambda, info, xtest] = NNHGS(A,b,L,n,varargin)
 % Optional inputs:
 %    * **disp_waitbar**:        Whether or not a waitbar should be displayed.
 %   
-%    * **welford**:             If Welford is ``true``, then Welford's Online Algorithm is used to return mean and standard deviation of the samples.
+%    * **welfordsalgorithm**:   If ``true``, then Welford's Online Algorithm is used to return mean and standard deviation of the samples.
 %   
 %    * **nburnin**:             Samples to be generated before Welford's Algorithm starts. Only used if ``welford=true``. 
 %   
@@ -42,18 +42,18 @@ function [x, alpha, delta, lambda, info, xtest] = NNHGS(A,b,L,n,varargin)
 % - - - - - - - - - - -  Optional inputs - - - - - - - - - - - 
 %Set the default parameters for the NNHGS
 disp_waitbar = true;
-welford = false;
+welfordsalgorithm = false;
 keep = 1;
 solver  = 'lsqlin';
 scaling = true;
 
 %Unpack the varargin and evaluate.
-validvars = {'disp_waitbar','welford','keep','solver','scaling','nburnin'};
+validvars = {'disp_waitbar','welfordsalgorithm','keep','solver','scaling','nburnin'};
 evals = varargin_to_eval(varargin,validvars);
 for i=1:length(evals); eval(evals{i}); end
 
-if ~islogical(welford), error('Welford should be logical'), end
-if ~welford && keep ~= 1
+if ~islogical(welfordsalgorithm), error('Welford should be logical'), end
+if ~welfordsalgorithm && keep ~= 1
    warning('Trimming has to be done manually if Welford is false.') 
 end
 
@@ -74,7 +74,7 @@ end
 
 A = A*scaling_factor;
 
-if welford
+if welfordsalgorithm
     if ~exist('nburnin','var')
         error("Burn-in should be specified with Welford's Algorithm")
     end
@@ -83,6 +83,7 @@ if welford
     nidx = nidx + nburnin;
     nsamps = nidx(end);
 else
+    if exist('nburnin','var'), warning('nburnin specified but not used.'); end
     nidx = 1:n;
     nsamps = n;
     nburnin = 0;
@@ -107,7 +108,7 @@ if all(size(L) == 0)
    L = speye(N); 
 end
 
-if welford
+if welfordsalgorithm
     x = zeros(N,2);
 else
     x = zeros(N,nsamps);
@@ -141,8 +142,8 @@ a1 = 1;
 t1 = 0.0001;
 
 %Index for Welford's Online Algorithm
-if welford, welford_i = 1; end
-xtest = [];
+if welfordsalgorithm, count = 0; end
+
 for i=2:nsamps
    if disp_waitbar, waitbar(i/nsamps, f, 'Sampling...'), end
    
@@ -184,25 +185,16 @@ for i=2:nsamps
          error('Wrong solver specified.')
    end
 
-   %Perhaps Welford should be written into it's own function
-   if welford
-       xtest = [xtest xtemp];
+   if welfordsalgorithm
        if (mod(i-nburnin,keep) || keep == 1) == 1 && nburnin < i
-           xwelford = xtemp*scaling_factor; %Properly scaled of x.
            %True if i = (nburnin+1)+keep*p, where p = 0, 1, ...
-           if welford_i == 1
-               %M1 and S1 has to be initialized as xtemp and 0.
-               Mk = xwelford;
+           if count == 0
+               Mk = xtemp;
                Sk = zeros(size(xtemp));
+               count = 1;
            else
-               Mprev = Mk; %M_{k-1}
-               Sprev = Sk; %S_{k-1}
-               %We use the recurrence formulas
-               welford_i = welford_i + 1; %so that welford_i = 2 for 2nd sample, 3 for 3rd ...
-               Mk = Mprev + (xwelford - Mprev)/welford_i; 
-               Sk = Sprev + (xwelford - Mprev).*(xwelford - Mk);
+               [Mk, Sk, count] = welford(Mk, Sk, count, 'update', xtemp);
            end
-           welford_i = welford_i + 1;
        end
    else
        %If no Welford, then we should save all samples
@@ -215,7 +207,7 @@ for i=2:nsamps
 end
 
 %Saving to the info struct.
-info.welford = welford;
+info.welford = welfordsalgorithm;
 info.n = n;
 info.nsamps = nsamps;
 info.nburnin = nburnin;
@@ -225,23 +217,19 @@ info.alpha = alph_sim;
 info.delta = del_sim;
 info.lambda = lam_sim;
 
-if welford   
+if welfordsalgorithm   
     %Remove the burnin and trim the three chains.
     alpha = alph_sim(info.nidx);
     delta = del_sim(info.nidx);
     lambda = lam_sim(info.nidx);
+    [xmean, xstd] = welford(Mk, Sk, count, 'finalize');
+    x = [xmean xstd]; 
+    x = x*scaling_factor;
 else
     %Return all of them.
     alpha = alph_sim;
     delta = del_sim;
     lambda = lam_sim;
-end
-
-if welford
-    x(:,1) = Mk; %mean
-    x(:,2) = (Sk/(welford_i-1)).^(1/2); %standard deviation
-    xtest = xtest*scaling_factor;
-else
     x = x*scaling_factor;
 end
 

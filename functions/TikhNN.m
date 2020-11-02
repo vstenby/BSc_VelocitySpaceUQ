@@ -45,7 +45,7 @@ function [x, alpha, varargout] = TikhNN(A,b,alpha,L,varargin)
 %
 %    * **relerr**:          Relative error
 
-[~,N] = size(A);
+[M,N] = size(A);
 
 %Make sure we deal with L.
 if nargin <= 3
@@ -59,12 +59,10 @@ varargout_idx = 1;
 
 % - - - - - - - - - - -  Optional inputs - - - - - - - - - - - 
 %Set default values for optional parameters.
-solver = 'lsqnonneg'; solvers = {'GPCG','\','lsqnonneg'};
+solver = 'lsqlin'; solvers = {'lsqlin','lsqnonneg','\'};
 scaling = true;
 return_relerr = false;
 
-%Check if mosek is installed correctly
-if ~check_mosek(), warning('mosek is not installed - consider changing solver.'), end
 
 nalpha = length(alpha);
 if nalpha~=1
@@ -90,6 +88,17 @@ if return_relerr && ~exist('x_true','var')
 elseif ~return_relerr && exist('x_true','var')
     warning('x_true given but not used.')
 end
+
+if ~check_mosek() && strcmpi(solver,'lsqnonneg')
+   warning('mosek is not installed, switching default solver to lsqlin.') 
+   solver = 'lsqlin';
+end
+
+if strcmpi(solver,'lsqlin')
+    opts = optimset('display','off'); 
+end
+
+
 % - - - - - - - - - - -  Optional inputs - - - - - - - - - - - 
 
 if dispwaitbar
@@ -111,21 +120,29 @@ x = zeros(N,nalpha);
 
 % -- Main loop --
 switch solver
-    case 'GPCG'
-        LtL = L'*L; %Precompute LtL for speed.
-        x0 = zeros(N,1); 
-        for i=1:nalpha
-            B   = @(x) (A'*(A*x)) + alpha(i)*LtL*x; 
-            rhs = A'*b;
-            x(:,i) = GPCG(B, rhs, x0, 50);
-            %x(:,i) = GPCG(B, rhs, x0, 50, 5, 20, 1e-6);
-            if dispwaitbar, waitbar(i/nalpha, f, 'Solving...'), end
-        end
+    %case 'GPCG'
+    %    LtL = L'*L; %Precompute LtL for speed.
+    %    x0 = zeros(N,1); 
+    %    for i=1:nalpha
+    %        B   = @(x) (A'*(A*x)) + alpha(i)*LtL*x; 
+    %        rhs = A'*b;
+    %        x(:,i) = GPCG(B, rhs, x0, 50);
+    %        %x(:,i) = GPCG(B, rhs, x0, 50, 5, 20, 1e-6);
+    %        if dispwaitbar, waitbar(i/nalpha, f, 'Solving...'), end
+    %    end
     case 'lsqnonneg'
         for i=1:nalpha
             C = [A ; sqrt(alpha(i))*L];
             d = [b ; zeros(size(L,1),1)];
             x(:,i) = lsqnonneg(C,d);
+            if dispwaitbar, waitbar(i/nalpha, f, 'Solving...'), end
+        end
+    case 'lsqlin'
+        for i=1:nalpha
+            C = [A ; sqrt(alpha(i))*L];
+            d = [b ; zeros(size(L,1),1)];
+            lb = zeros(N,1); %Lower bounds
+            x(:,i) = lsqlin(C,d,[],[],[],[],lb,[],zeros(N,1),opts);
             if dispwaitbar, waitbar(i/nalpha, f, 'Solving...'), end
         end
     case '\'

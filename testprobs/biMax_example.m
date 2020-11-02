@@ -5,7 +5,7 @@ clear, clc, close all
 addpath(genpath('../functions'))
 addpath(genpath('../../aux'))
 
-rhs = 3;
+rhs = 2;
 
 %Parameters for the (vpara,vperp)-grid.
 vparamin=-4e6;
@@ -83,7 +83,7 @@ caxis_mu  = [min([xtrue(:) ; xNNHGS0(:,1) ; xNNHGS1(:,1)]), ...
 caxis_std = [min([xNNHGS0(:,2) ; xNNHGS1(:,2)]), ...
              max([xNNHGS0(:,2) ; xNNHGS1(:,2)])];
 
-%% Plots
+
 figure
 subplot(4,3,[1,4,7,10])
 semilogx(alpha_relerr,r0th, 'r-')

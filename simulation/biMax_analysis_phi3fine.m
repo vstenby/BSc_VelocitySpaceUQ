@@ -14,4 +14,4 @@ addpath('biMax_sim_phi3fine')
 files = {dir('biMax_sim_phi3fine/*.mat').name}; 
 
 phi_analysis_table(files)
-phi_analysis_plot(files)
+%(files)
