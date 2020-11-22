@@ -52,7 +52,7 @@ L.L1E = L1E;
 L.L0b = L0b;
 
 % -- Tikhonov for different values of alpha --
-alpha = logspace(-6,5,20); 
+alpha = logspace(-6,5,200); 
 [xalpha, ~, relerr] = TikhNN(A, b, alpha, L, 'return_relerr', true, 'x_true', xtrue);
 % -- End of Tikhonov --
 
