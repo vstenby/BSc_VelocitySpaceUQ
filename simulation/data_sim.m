@@ -2,6 +2,10 @@ function data_sim(sim_idx)
 % Simulates the different setups.
 %clear, clc, close all
 
+%Add dependencies to path.
+addpath(genpath('../functions'))
+addpath(genpath('../../aux'))
+
 %sim_idx = 1;
 % We have 7 different timestamps, and for each timestamp we have 4 rhs.
 % This means a total of 28 simulations.
