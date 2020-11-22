@@ -60,7 +60,7 @@ varargout_idx = 1;
 % - - - - - - - - - - -  Optional inputs - - - - - - - - - - - 
 %Set default values for optional parameters.
 solver = 'lsqlin'; solvers = {'lsqlin','lsqnonneg','\'};
-scaling = true;
+scaling = true; %Fix this?
 return_relerr = false;
 
 
@@ -98,6 +98,11 @@ if strcmpi(solver,'lsqlin')
     opts = optimset('display','off'); 
 end
 
+if isstruct(L) && ~strcmpi(scaling,'norm')
+    %If L is a struct containing L1p, L1E and L0b, then 
+    %we should Birgitte's scaling method.
+    scaling = 'norm';
+end
 
 % - - - - - - - - - - -  Optional inputs - - - - - - - - - - - 
 
@@ -106,14 +111,17 @@ if dispwaitbar
 end
 
 %Scaling is set to 1/max(A) if need be, otherwise 1.
-if scaling
+if strcmpi(scaling,'1/maxA')
     scaling_factor = 1/max(A(:));
+    %Scale A.
+    A = A*scaling_factor;
+elseif strcmpi(scaling,'norm')
+    [A, b, L, scaling_factor] = norm_normalization(A,b,L);
 else
     scaling_factor = 1;
 end
 
-%Scale A.
-A = A*scaling_factor;
+
 
 %Preallocate x for speed.
 x = zeros(N,nalpha);
@@ -141,8 +149,9 @@ switch solver
         for i=1:nalpha
             C = [A ; sqrt(alpha(i))*L];
             d = [b ; zeros(size(L,1),1)];
-            lb = zeros(N,1); %Lower bounds
-            x(:,i) = lsqlin(C,d,[],[],[],[],lb,[],zeros(N,1),opts);
+            lb = zeros(N,1); %Lower bound;
+            [x(:,i), ~, ~, exitflag] = lsqlin(C,d,[],[],[],[],lb,[],zeros(N,1),opts);
+            if exitflag <= 0, warning('not optimal solution'), end
             if dispwaitbar, waitbar(i/nalpha, f, 'Solving...'), end
         end
     case '\'

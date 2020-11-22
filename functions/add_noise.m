@@ -1,7 +1,12 @@
-function[b, e] = add_noise(b0)
+function[b, e] = add_noise(b0,noise_level,background_level)
 
-noise_level = 0.01;
-background_level = 1;
+if nargin == 1
+    noise_level = 0.01;
+    background_level = 1;
+elseif nargin == 2
+    background_level = 1;
+end
+
 background_errorlevel = sqrt(background_level);
 
 if length(background_errorlevel) == 1

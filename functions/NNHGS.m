@@ -45,7 +45,7 @@ disp_waitbar = true;
 welfordsalgorithm = false;
 keep = 1;
 solver  = 'lsqlin';
-scaling = true;
+scaling = true; %This should then be fixed.
 
 %Unpack the varargin and evaluate.
 validvars = {'disp_waitbar','welfordsalgorithm','keep','solver','scaling','nburnin'};
@@ -65,14 +65,23 @@ if ~check_mosek() && strcmpi(solver,'lsqnonneg')
    solver = 'lsqlin';
 end
 
-%Scale our A
-if scaling
+if isstruct(L) && ~strcmpi(scaling,'norm')
+    scaling = 'norm';
+    %If L is a struct containing L1p, L1E and L0b, then 
+    %we should Birgitte's scaling method.
+    warning('L is a struct, changing scaling type to norm.')
+end
+
+%Scaling is set to 1/max(A) if need be, otherwise 1.
+if strcmpi(scaling,'1/maxA')
     scaling_factor = 1/max(A(:));
+    %Scale A.
+    A = A*scaling_factor;
+elseif strcmpi(scaling,'norm')
+    [A, b, L, scaling_factor] = norm_normalization(A,b,L);
 else
     scaling_factor = 1;
 end
-
-A = A*scaling_factor;
 
 if welfordsalgorithm
     if ~exist('nburnin','var')
