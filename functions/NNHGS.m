@@ -69,7 +69,7 @@ if isstruct(L) && ~strcmpi(scaling,'norm')
     scaling = 'norm';
     %If L is a struct containing L1p, L1E and L0b, then 
     %we should Birgitte's scaling method.
-    warning('L is a struct, changing scaling type to norm.')
+    %warning('L is a struct, changing scaling type to norm.')
 end
 
 %Scaling is set to 1/max(A) if need be, otherwise 1.
