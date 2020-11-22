@@ -7,7 +7,7 @@
 ### -- ask for number of cores (default: 1) --
 #BSUB -n 4
 ### -- set walltime limit: hh:mm --
-#BSUB -W 01:00
+#BSUB -W 02:00
 ### -- specify that we need 2GB of memory per core/slot --
 #BSUB -R "rusage[mem=2GB]"
 ### -- set the email address --
@@ -26,4 +26,4 @@
 # here follow the commands you want to execute
 # Program_name_and_options
 
-matlab -nodisplay -r 'biMax_sim_phi3($LSB_JOBINDEX)' -logfile testOut
+matlab -nodisplay -r 'biMax_sim_phi3fine($LSB_JOBINDEX)' -logfile testOut
