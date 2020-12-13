@@ -78,7 +78,7 @@ for i=1:length(evals); eval(evals{i}); end
 
 
 if ~any(strcmpi(solver,solvers)), error('Invalid solver.'), end
-if ~islogical(scaling), error('Scaling should be either true or false.'), end
+%if ~islogical(scaling), error('Scaling should be either true or false.'), end
 if ~islogical(dispwaitbar), error('Waitbar should either be true or false.'), end
 if ~islogical(return_relerr), error('Relative error should be either true or false.'), end
     

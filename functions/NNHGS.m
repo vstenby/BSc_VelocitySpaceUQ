@@ -57,7 +57,7 @@ if ~welfordsalgorithm && keep ~= 1
    warning('Trimming has to be done manually if Welford is false.') 
 end
 
-if ~islogical(scaling), error('Scaling should be logical'), end
+%if ~islogical(scaling), error('Scaling should be logical'), end
 % - - - - - - - - - - -  Optional inputs - - - - - - - - - - - 
 
 if ~check_mosek() && strcmpi(solver,'lsqnonneg')
