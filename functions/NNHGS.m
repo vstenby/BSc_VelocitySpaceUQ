@@ -153,6 +153,8 @@ t1 = 0.0001;
 %Index for Welford's Online Algorithm
 if welfordsalgorithm, count = 0; end
 
+if strcmpi(solver,'GPCG'), x0 = zeros(N,1); end
+
 for i=2:nsamps
    if disp_waitbar, waitbar(i/nsamps, f, 'Sampling...'), end
    

@@ -140,9 +140,16 @@ switch solver
     %    end
     case 'lsqnonneg'
         for i=1:nalpha
+<<<<<<< HEAD
             C = [A ; sqrt(alpha(i))*L];
             d = [b ; zeros(size(L,1),1)];
             x(:,i) = lsqnonneg(C,d);
+=======
+            B   = @(x) (A'*(A*x)) + alpha(i)*LtL*x; 
+            rhs = A'*b;
+            %x(:,i) = GPCG(B, rhs, x0, 50);
+            x(:,i) = GPCG(B, rhs, x0, 50, 5, 20, 1e-6);
+>>>>>>> DentalCT
             if dispwaitbar, waitbar(i/nalpha, f, 'Solving...'), end
         end
     case 'lsqlin'
