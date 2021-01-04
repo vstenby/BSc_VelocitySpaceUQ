@@ -60,8 +60,6 @@ vthpara=sqrt(2*Tpara*Qe/Mi);
 vthperp=sqrt(2*Tperp*Qe/Mi);
 
 
-
-
 %3D bi-Maxwellian with drift in (vpa,vpe)
 for j=1:length(vperp)
     fvpavpe3DbiMaxDrift(j,:)=ni/(pi^(3/2)*vthpara*vthperp^2)*exp(-((vpara-vparadrift)/vthpara).^2-(vperp(j)/vthperp)^2);

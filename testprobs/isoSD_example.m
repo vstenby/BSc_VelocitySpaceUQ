@@ -17,7 +17,8 @@ vperpmax = 1.4e7;
 phi = [10 20 40 70 85];
 
 %Construct the u-vector.
-u = construct_uvec('Emin', 10e3, 'Emax', 4e6, 'udim', 100);
+%u = construct_uvec('Emin', 10e3, 'Emax', 4e6, 'udim', 100);
+u = construct_uvec('Emax', 4e6, 'udim', 100);
 
 %Construct the normal grid and our true solution.
 vparadim = 40; vperpdim = 20;

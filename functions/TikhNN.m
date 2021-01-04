@@ -60,7 +60,7 @@ varargout_idx = 1;
 % - - - - - - - - - - -  Optional inputs - - - - - - - - - - - 
 %Set default values for optional parameters.
 solver = 'lsqlin'; solvers = {'lsqlin','lsqnonneg','\'};
-scaling = true; %Fix this?
+scaling = true; %Default scaling is on.
 return_relerr = false;
 
 

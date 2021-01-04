@@ -160,12 +160,13 @@ for i=2:nsamps
    
    %NNHGS loop:
    Axtemp = A*xtemp;
-   LtLxtemp = LtL*xtemp;
+   %LtLxtemp = LtL*xtemp; Probably not needed anymore.
    
    %Note here that 1./ is because of the way MATLAB does gamrnd. 
    %Equation (58) and (59) in Dental CT
    lam_temp  = gamrnd(a0 + M/2, 1./(t0+norm(Axtemp(:)-b(:))^2/2)); 
-   del_temp  = gamrnd(a1 + N/2, 1./(t1+xtemp(:)'*LtLxtemp(:)/2)); 
+   del_temp  = gamrnd(a1 + N/2, 1./(t1+norm(L*xtemp(:))^2/2));
+   %del_temp  = gamrnd(a1 + N/2, 1./(t1+xtemp(:)'*LtLxtemp(:)/2)); %Written in new notation, should be the same. 
    
    alph_temp = del_temp/lam_temp;
    

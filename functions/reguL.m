@@ -3,23 +3,28 @@ function L = reguL(varargin)
 % assumptions about the border.
 %
 % Usage: 
-%    ``L = reguL(vperpdim, vparadim)`` 
+%    ``L = reguL(vpara, vperp)`` 
 %
 % Inputs:
 %    * **A**:                   TODO: Fix this documentation.
 %
-% Optional inputs:
-%    * **disp_waitbar**:        None.
-%   
 % Output:
 %    * **L**:               	The regularization matrix L.
 
+
 switch nargin
     case 1
-        dim = varargin{1}; 
-        nrow = dim(1); ncol = dim(2);
+        ginfo = varargin{1};
+        %ginfo struct.
+        s = ginfo.vperp_ax; hs = s(2)-s(1); m = length(s);
+        t = ginfo.vpara_ax; ht = t(2)-t(1); n = length(t);
     case 2
-        nrow = varargin{1}; ncol = varargin{2};
+        %Two grids. 
+        T = varargin{1}; t = T(1,:); ht = t(2)-t(1); n = length(t);
+        S = varargin{2}; s = S(:,1); hs = s(2)-s(1); m = length(s);
+        
+        %Check that grids are given properly
+        if (ht == 0||hs == 0), error('hs or ht was zero.'), end
     otherwise
         error('Wrong number of inputs')
 end
@@ -28,5 +33,6 @@ end
 I = @(d) speye(d);
 D = @(d) spdiags([zeros(d-1,1) -ones(d-1,1) ones(d-1,1)],-1:1,d-1,d);
 
-L = [kron(D(ncol), I(nrow)) ; kron(I(ncol),D(nrow))];
+L = [kron(1/ht*D(n), I(m)) ; kron(I(n),1/hs*D(m))];
+
 end

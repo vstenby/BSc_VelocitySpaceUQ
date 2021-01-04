@@ -1,8 +1,8 @@
 clear, clc, close all
 
-N = 124;
-theta = 180-95 : 1.25 : 180+95;         %Angles.
-p = 75;                                 %Test setup.
+N = 30;
+theta = 180-95 : 10 : 180+95;         %Angles.
+p = 35;                                 %Test setup.
 R = 6;
 dw = 1.5;
 sd = 9;
@@ -23,34 +23,25 @@ b = Ax + noise*randn(size(Ax));
 
 imagesc(reshape(b, p, length(theta)));
 
-%% UQ Using the new tools
-L = reguL(124,124);
-alphavec = logspace(-1,1,50);
-[~,~,r0] = TikhNN(A,b,alphavec,[],'solver','GPCG','return_relerr',true,'x_true',x(:));
-[~,~,r1] = TikhNN(A,b,alphavec,L,'solver','GPCG','return_relerr',true,'x_true',x(:));
+%%
+% UQ Using the new tools
+L = reguL(N,N);
+alphavec = logspace(-2,1,30);
+[xrecon,~,r0] = TikhNN(A,b,alphavec,L,'solver','\','return_relerr',true,'x_true',x(:));
 
-%% Find the optimal
+semilogx(alphavec,r0)
 
-[~,idx0] = min(r0); optalpha0 = alphavec(idx0);
-[~,idx1] = min(r1); optalpha1 = alphavec(idx1);
-
-xopt0 = TikhNN(A,b,optalpha0,[],'solver','GPCG');
-xopt1 = TikhNN(A,b,optalpha1,L,'solver','GPCG');
+%%
+figure
+semilogx(alphavec,r0)
 
 figure
-subplot(1,3,1)
-imagesc(x); title('True solution'); axis image
-
-subplot(1,3,2)
-imagesc(reshape(xopt0,124,124)); title('Optimal 0th order Tikhonov'); axis image;
-
-subplot(1,3,3)
-imagesc(reshape(xopt1,124,124)); title('Optimal 1st order Tikhonov'); axis image;
+%Optimal recon
+[~,idx] = min(r0); imagesc(reshape(xrecon(:,idx),N,N)); axis image;
 
 %% Let's go with the UQ
 
-[xNNHGS0, alpha0] = NNHGS(A,b,[],100,'welford',true,'nburnin',10, 'solver', 'GPCG');
-[xNNHGS1, alpha1] = NNHGS(A,b,L,100,'welford',true,'nburnin',10, 'solver', 'GPCG');
+[xNNHGS0, alpha0] = NNHGS(A,b,[],500,'solver','lsqlin', 'welfordsalgorithm',true,'nburnin',50);
 
 %%
 figure

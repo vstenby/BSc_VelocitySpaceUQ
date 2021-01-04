@@ -49,7 +49,9 @@ for i=1:length(evals); eval(evals{i}); end
 vcrit=sqrt(2*Ecrit*Qe/Mi);
 vbirth=sqrt(2*Ebirth*Qe/Mi);
 
-fvpavpe3DSD=ne*3/(4*pi)/(log(1+(vbirth/vcrit)^3))./((vpara.^2+vperp.^2).^1.5+vcrit^3).*erfc((0.5*Mi*(vpara.^2+vperp.^2)/Qe-Ebirth)/Ebirthwidth)/2;
+%fvpavpe3DSD=ne*3/(4*pi)/(log(1+(vbirth/vcrit)^3))./((vpara.^2+vperp.^2).^1.5+vcrit^3).*erfc((0.5*Mi*(vpara.^2+vperp.^2)/Qe-Ebirth)/Ebirthwidth)/2;
+fvpavpe3DSD = ne*3/(4*pi*log(1+(vbirth/vcrit)^3)).*heaviside(vbirth - sqrt(vpara.^2 + vperp.^2))./((vpara.^2+vperp.^2).^1.5 + vcrit^3);
+
 x = fvpavpe3DSD.*(2*pi*vperp);
 
 %Saving the relevant parameters to the info structure.

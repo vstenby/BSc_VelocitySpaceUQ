@@ -1,6 +1,6 @@
 function varargout = welford(Mk, Sk, count, s, varargin)
 %Count is the number of samples seen so far.
-
+%https://www.johndcook.com/blog/standard_deviation/
 switch s
     case 'update'
         x = varargin{1};

@@ -35,7 +35,6 @@ for i=1:length(evals); eval(evals{i}); end
 
 background_errorlevel = sqrt(background_level);
 
-%Should this be changed such that we can call biMaxb or isoSDb?
 b0 = A*x;
 
 if length(background_errorlevel) == 1

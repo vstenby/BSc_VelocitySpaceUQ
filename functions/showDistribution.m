@@ -14,6 +14,10 @@ if isstruct(gridinfo)
     xlabel('v_{||}', 'FontSize', 10); ylabel('v_{\perp}', 'FontSize', 10);
     set(gca, 'TickLabelInterpreter', 'latex')
     colorbar();
+    
+    %Make the fontsize bigger.
+    ax = gca;
+    ax.FontSize = 16; 
 else
     if any(size(X) == 1); X = reshape(X, gridinfo(1), gridinfo(2)); end
     

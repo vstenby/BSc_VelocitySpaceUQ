@@ -5,7 +5,7 @@ clear, clc, close all
 addpath(genpath('../functions'))
 addpath(genpath('../../aux'))
 
-rhs = 2;
+rhs = 1;
 
 %Parameters for the (vpara,vperp)-grid.
 vparamin=-4e6;
@@ -21,6 +21,7 @@ u = construct_uvec('umax', 5*1e6, 'du', 1e5);
 
 %Construct the normal grid and our true solution.
 vparadim = 40; vperpdim = 20;
+
 [vpara, vperp, ginfo] = construct_vgrid(vparadim, vperpdim,'vperpmin',vperpmin,'vperpmax',vperpmax,'vparamin',vparamin,'vparamax',vparamax);
 xtrue = biMaxx(vpara,vperp);
 
@@ -47,26 +48,29 @@ end
 [A, b] = error_normalization(A,b,e);    
 
 %Regularization matrix L (1st order Tikhonov)
-L = reguL(vperpdim, vparadim);
+%L = reguL(vperpdim, vparadim);
+L = reguL(vpara,vperp);
 
 %A vector of alphas for finding the optimal regularization parameter.
-alpha_relerr = logspace(-9,-4,20);
+alphas0 = logspace(-9,-4,50);
+alphas1 = logspace(-4,4,50); 
 
 %Find the relative error for 0th order and 1st order.
-[~, ~, r0th] = TikhNN(A, b, alpha_relerr, [], 'return_relerr', true, 'x_true', xtrue);
-[~, ~, r1st] = TikhNN(A, b, alpha_relerr,  L, 'return_relerr', true, 'x_true', xtrue);
+[~, ~, r0] = TikhNN(A, b, alphas0, [], 'return_relerr', true, 'x_true', xtrue);
+[~, ~, r1] = TikhNN(A, b, alphas1,  L, 'return_relerr', true, 'x_true', xtrue);
 
 %Find the alpha with the smallest relative error.
-[minr0,idx0] = min(r0th); optalpha_0th = alpha_relerr(idx0);
-[minr1,idx1] = min(r1st); optalpha_1st = alpha_relerr(idx1);
+[minr0,idx0] = min(r0); alpha0opt = alphas0(idx0);
+[minr1,idx1] = min(r1); alpha1opt = alphas1(idx1);
 
 %Find the corresponding solution.
-xopt0 = TikhNN(A,b,optalpha_0th);
-xopt1 = TikhNN(A,b,optalpha_1st,L);
+xopt0 = TikhNN(A,b,alpha0opt);
+xopt1 = TikhNN(A,b,alpha1opt,L);
 
+%%
 %Do the sampling.
-[xNNHGS0, alphasim0, deltasim0, lambdasim0, NNHGS0info] = NNHGS(A,b,[],100,'solver', 'lsqnonneg', 'welford',true,'nburnin',10);
-[xNNHGS1, alphasim1, deltasim1, lambdasim1, NNHGS1info] = NNHGS(A,b,L,100,'solver','lsqnonneg','welford',true,'nburnin',10);
+[xNNHGS0, alphasim0, deltasim0, lambdasim0, NNHGS0info] = NNHGS(A,b,[],100,'solver', 'lsqnonneg', 'welfordsalgorithm',true,'nburnin',10);
+[xNNHGS1, alphasim1, deltasim1, lambdasim1, NNHGS1info] = NNHGS(A,b,L,100,'solver','lsqnonneg', 'welfordsalgorithm', true, 'nburnin',10);
 
 %Calculate reconstruction with mean(alpha)
 xsamplealpha0 = TikhNN(A,b,mean(alphasim0));
@@ -86,13 +90,13 @@ caxis_std = [min([xNNHGS0(:,2) ; xNNHGS1(:,2)]), ...
 
 figure
 subplot(4,3,[1,4,7,10])
-semilogx(alpha_relerr,r0th, 'r-')
+semilogx(alphas0,r0, 'r-')
 hold on
-semilogx(alpha_relerr,r1st, 'b-')
+semilogx(alphas1,r1, 'b-')
 ax = gca; ax.YGrid = 'on'; ax.GridLineStyle = '-'; yticks(0:0.025:1);
 legend('0th','1st', 'AutoUpdate', 'off');
-plot(optalpha_0th, minr0,'r.','MarkerSize',15);  xlabel('\alpha','FontSize',15)
-plot(optalpha_1st, minr1,'b.','MarkerSize',15);
+plot(alpha0opt, minr0,'r.','MarkerSize',15);  xlabel('\alpha','FontSize',15)
+plot(alpha1opt, minr1,'b.','MarkerSize',15);
 
 xline(CIalpha0(1),'r-.','LineWidth',3,'alpha',0.2);
 xline(CIalpha0(2),'r-.','LineWidth',3,'alpha',0.2);
