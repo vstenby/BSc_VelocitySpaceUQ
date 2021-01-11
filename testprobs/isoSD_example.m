@@ -44,6 +44,7 @@ switch rhs
         [b, e] = add_noise(b);
 end
 
+%%
 %Normalize with this noise.
 [A, b] = error_normalization(A,b,e); 
 

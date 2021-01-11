@@ -3,15 +3,13 @@
 clear, clc, close all
 
 %Download the files DTUs servers.
-if ~isfolder('data_sim')
-    HPCDownload('data_sim','data_sim','s174483');
+if ~isfolder('../data/data_sim')
+    HPCDownload('data_sim','./data/data_sim','s174483');
 end
-
-addpath('data_sim')
 
 % Set the timestamp for analysis
 ts = 4;
-[sim_rhs_01, sim_rhs_02, sim_rhs_03, sim_rhs_04] = load_data(ts, 'data_sim');
+[sim_rhs_01, sim_rhs_02, sim_rhs_03, sim_rhs_04] = load_data(ts, '../data/data_sim');
 
 %%
 
@@ -42,15 +40,15 @@ showDistribution(sim_rhs_03.xsim(:,1))
 
 figure
 showDistribution(sim_rhs_01.xtrue); 
-title('True solution')
 %saveas(gcf, 'ts_06_xtrue.pdf')
 
+%%
 figure
 plot(sim_rhs_01.b);
 hold on
 plot(sim_rhs_02.b); plot(sim_rhs_03.b); plot(sim_rhs_04.b);
 title('Right hand sides')
-legend('Inverse crime', 'No inverse crime', 'FIDAsim', 'Real data', 'location', 'northwest')
+legend('Inverse crime', 'No inverse crime', 'FIDAsim', 'Real data', 'location', 'northwest','FontSize',15)
 %saveas(gcf, 'ts_06_rhs.pdf')
 
 %% Various reconstructions
@@ -61,34 +59,9 @@ close all
 [~,min_rhs4] = min(sim_rhs_04.relerr);
 
 switch ts
-    case 1
-        idx_invcrime = [1, 20, 40, min_rhs1, 100, 150];
-        idx_nocrime  = [1, 20, 40, min_rhs2, 130, 170];
-        idx_fidasim  = [1, 40, 50, min_rhs3, 150, 190];
-        idx_realdata = [1, 20, 60, 100, 120, min_rhs4];
-    case 2
-        idx_invcrime = [1, 20, 40, min_rhs1, 100, 150];
-        idx_nocrime  = [1, 20, 40, min_rhs2, 130, 170];
-        idx_fidasim  = [1, 40, 70, min_rhs3, 150, 190];
-        idx_realdata = [1, 20, 35, 75, min_rhs4, 140];
-    case 3
-        idx_invcrime = [1, 20, 70, min_rhs1, 100, 150];
-        idx_nocrime  = [1, 20, 70, min_rhs2, 130, 170];
-        idx_fidasim  = [1, 40, 80, min_rhs3, 150, 190];
-        idx_realdata = [1, 20, 35, 70, min_rhs4, 140];
-    case 4
-        idx_invcrime = [1, 20, 80, min_rhs1, 120, 150];
-        idx_nocrime  = [1, 20, 80, min_rhs2, 130, 170];
-        idx_fidasim  = [1, 40, 80, min_rhs3, 150, 190];
-        idx_realdata = [1, 20, 55, min_rhs4, 115, 140];
-    case 5
-        idx_invcrime = [1, 20, 40, min_rhs1, 120, 150];
-        idx_nocrime  = [1, 20, 40, min_rhs2, 130, 170];
-        idx_fidasim  = [1, 40, 50, min_rhs3, 150, 190];
-        idx_realdata = [1, 20, 35, 70, min_rhs4, 140];
     case 6
         idx_invcrime = [1, 20, 40, min_rhs1, 100, 150];
-        idx_nocrime  = [1, 20, 40, min_rhs2, 130, 170];
+        idx_nocrime  = [1, 20, 35, min_rhs2, 130, 170];
         idx_fidasim  = [1, 40, 50, min_rhs3, 150, 190];
         idx_realdata = [1, 20, 35, 75, min_rhs4, 140];
     otherwise     
@@ -96,35 +69,33 @@ end
 
 figure('units','normalized','outerposition',[0 0 1 1])
 
-recon_plot(sim_rhs_01, idx_invcrime); sgtitle('Inverse crime')
+recon_plot(sim_rhs_01, idx_invcrime); sgtitle('Inverse crime','FontSize',20)
 set(gcf,'Units','Inches');
 pos = get(gcf,'Position');
 set(gcf,'PaperPositionMode','Auto','PaperUnits','Inches','PaperSize',[pos(3), pos(4)])
-%print(gcf,'ts_06_recon_invcrime','-dpdf','-r0')
+print(gcf,'ts_04_recon_invcrime','-dpdf','-r0')
 
 figure('units','normalized','outerposition',[0 0 1 1])
-recon_plot(sim_rhs_02, idx_nocrime); sgtitle('No inverse crime')
+recon_plot(sim_rhs_02, idx_nocrime); sgtitle('No inverse crime','FontSize',20)
 set(gcf,'Units','Inches');
 pos = get(gcf,'Position');
 set(gcf,'PaperPositionMode','Auto','PaperUnits','Inches','PaperSize',[pos(3), pos(4)])
-%print(gcf,'ts_06_recon_nocrime','-dpdf','-r0')
+print(gcf,'ts_04_recon_nocrime','-dpdf','-r0')
 
 figure('units','normalized','outerposition',[0 0 1 1])
-recon_plot(sim_rhs_03, idx_fidasim); sgtitle('FIDAsim')
+recon_plot(sim_rhs_03, idx_fidasim); sgtitle('FIDAsim','FontSize',20)
 set(gcf,'Units','Inches');
 pos = get(gcf,'Position');
 set(gcf,'PaperPositionMode','Auto','PaperUnits','Inches','PaperSize',[pos(3), pos(4)])
-%print(gcf,'ts_06_recon_fidasim','-dpdf','-r0')
+print(gcf,'ts_04_recon_fidasim','-dpdf','-r0')
 
 figure('units','normalized','outerposition',[0 0 1 1])
-recon_plot(sim_rhs_04, idx_realdata); sgtitle('Real data')
+recon_plot(sim_rhs_04, idx_realdata); sgtitle('Real data','FontSize',20)
 set(gcf,'Units','Inches');
 pos = get(gcf,'Position');
 set(gcf,'PaperPositionMode','Auto','PaperUnits','Inches','PaperSize',[pos(3), pos(4)])
-%print(gcf,'ts_06_recon_realdata','-dpdf','-r0')
+print(gcf,'ts_04_recon_realdata','-dpdf','-r0')
 
-
-close all
 %% Chain plots
 
 chain_analysis(sim_rhs_01.deltasim, sim_rhs_01.lambdasim)
@@ -138,54 +109,54 @@ chain_plot(sim_rhs_01, 'Inverse crime')
 set(gcf,'Units','Inches');
 pos = get(gcf,'Position');
 set(gcf,'PaperPositionMode','Auto','PaperUnits','Inches','PaperSize',[pos(3), pos(4)])
-print(gcf,'ts_06_chainplot_invcrime','-dpdf','-r0')
+print(gcf,'ts_04_chainplot_invcrime','-dpdf','-r0')
 
 figure
 chain_plot(sim_rhs_02, 'No inverse crime')
 set(gcf,'Units','Inches');
 pos = get(gcf,'Position');
 set(gcf,'PaperPositionMode','Auto','PaperUnits','Inches','PaperSize',[pos(3), pos(4)])
-print(gcf,'ts_06_chainplot_nocrime','-dpdf','-r0')
+print(gcf,'ts_04_chainplot_nocrime','-dpdf','-r0')
 
 figure
 chain_plot(sim_rhs_03, 'FIDAsim')
 set(gcf,'Units','Inches');
 pos = get(gcf,'Position');
 set(gcf,'PaperPositionMode','Auto','PaperUnits','Inches','PaperSize',[pos(3), pos(4)])
-print(gcf,'ts_06_chainplot_fidasim','-dpdf','-r0')
+print(gcf,'ts_04_chainplot_fidasim','-dpdf','-r0')
 
 figure
 chain_plot(sim_rhs_04, 'Real data')
 set(gcf,'Units','Inches');
 pos = get(gcf,'Position');
 set(gcf,'PaperPositionMode','Auto','PaperUnits','Inches','PaperSize',[pos(3), pos(4)])
-print(gcf,'ts_06_chainplot_realdata','-dpdf','-r0')
+print(gcf,'ts_04_chainplot_realdata','-dpdf','-r0')
 
 %%
 
-figure
-NNHGS_plot(sim_rhs_01); sgtitle('Inverse crime')
+figure('units','normalized','outerposition',[0 0 1 1])
+NNHGS_plot(sim_rhs_01); 
 set(gcf,'Units','Inches');
 pos = get(gcf,'Position');
 set(gcf,'PaperPositionMode','Auto','PaperUnits','Inches','PaperSize',[pos(3), pos(4)])
 print(gcf,'ts_06_UQ_invcrime','-dpdf','-r0')
 
-figure
-NNHGS_plot(sim_rhs_02); sgtitle('No inverse crime')
+figure('units','normalized','outerposition',[0 0 1 1])
+NNHGS_plot(sim_rhs_02); 
 set(gcf,'Units','Inches');
 pos = get(gcf,'Position');
 set(gcf,'PaperPositionMode','Auto','PaperUnits','Inches','PaperSize',[pos(3), pos(4)])
 print(gcf,'ts_06_UQ_nocrime','-dpdf','-r0')
 
-figure
-NNHGS_plot(sim_rhs_03); sgtitle('FIDA sim')
+figure('units','normalized','outerposition',[0 0 1 1])
+NNHGS_plot(sim_rhs_03); 
 set(gcf,'Units','Inches');
 pos = get(gcf,'Position');
 set(gcf,'PaperPositionMode','Auto','PaperUnits','Inches','PaperSize',[pos(3), pos(4)])
 print(gcf,'ts_06_UQ_fidasim','-dpdf','-r0')
 
-figure
-NNHGS_plot(sim_rhs_04); sgtitle('Real data')
+figure('units','normalized','outerposition',[0 0 1 1])
+NNHGS_plot(sim_rhs_04); 
 set(gcf,'Units','Inches');
 pos = get(gcf,'Position');
 set(gcf,'PaperPositionMode','Auto','PaperUnits','Inches','PaperSize',[pos(3), pos(4)])
@@ -217,7 +188,7 @@ function [sim_rhs_01, sim_rhs_02, sim_rhs_03, sim_rhs_04] = load_data(ts, folder
     end
 
     %Note that in the case of rhs_04, A and b is scaled by the error.
-    load(sprintf('./data/ts%d.mat',ts))
+    load(sprintf('../data/TCV/ts%d.mat',ts))
     sim_rhs_01.b = double(S_TR_invcrime_n);
     sim_rhs_02.b = double(S_TR_n);
     sim_rhs_03.b = double(fida_total_n);
@@ -237,7 +208,10 @@ colors = [128 0 0; ...
           0 0 128; ...
           230 25 75; ...
           245 130 48]./255;
-
+cax = [min([sim.xtrue ; sim.xalpha(:,idx(1)) ; sim.xalpha(:,idx(2)) ; sim.xalpha(:,idx(3)) ; ...
+            sim.xalpha(:,idx(4)) ; sim.xalpha(:,idx(5)); sim.xalpha(:,idx(6))]); ...
+       max([sim.xtrue ; sim.xalpha(:,idx(1)) ; sim.xalpha(:,idx(2)) ; sim.xalpha(:,idx(3)) ; ...
+            sim.xalpha(:,idx(4)) ; sim.xalpha(:,idx(5)); sim.xalpha(:,idx(6))])]; 
 %Show the different reconstructions
 subplot(3,4,[5,6,9,10])
 semilogx(sim.alpha, sim.relerr, 'k-'); title('\alpha vs relative error')
@@ -296,26 +270,27 @@ meanalpha = mean(sim.alphasim);
 
 %Show the different reconstructions
 subplot(2,3,[1,2])
-semilogx(sim.alpha, sim.relerr, 'k-'); title('\alpha vs relative error')
+semilogx(sim.alpha, sim.relerr, 'k-'); title('\alpha vs relative error','FontSize',30)
 hold on
 plot(sim.alpha(idx),sim.relerr(idx),'k.','MarkerSize',15)
 xline(qalpha(1), 'k--')
 xline(qalpha(2), 'k--')
 xline(meanalpha, 'k-')
 
+%cax = [min([sim.xtrue ; sim.xalpha(:,idx) ; sim.xsim(:,1)])
 subplot(2,3,3)
-showDistribution(sim.xtrue); title('True solution')
+showDistribution(sim.xtrue); title('True solution', 'FontSize', 30)
 
 subplot(2,3,4)
-showDistribution(sim.xalpha(:,idx)); title(sprintf('Minimum r solution, r = %.2f',sim.relerr(idx)))
+showDistribution(sim.xalpha(:,idx)); title(sprintf('Minimum r solution, r = %.2f',sim.relerr(idx)), 'FontSize', 30)
 
 %Posterior mean
 subplot(2,3,5)
-showDistribution(sim.xsim(:,1)); title(sprintf('Posterior mean, r = %.2f', relerr(sim.xtrue, sim.xsim(:,1))))
+showDistribution(sim.xsim(:,1)); title(sprintf('Sample mean, r = %.2f', relerr(sim.xtrue, sim.xsim(:,1))), 'FontSize', 30)
 
 %Standard deviation
 subplot(2,3,6)
-showDistribution(sim.xsim(:,2)); title('Standard deviation')
+showDistribution(sim.xsim(:,2)); title('Standard deviation', 'FontSize', 30)
 
 end
 

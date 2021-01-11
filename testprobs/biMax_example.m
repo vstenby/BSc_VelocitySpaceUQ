@@ -5,7 +5,7 @@ clear, clc, close all
 addpath(genpath('../functions'))
 addpath(genpath('../../aux'))
 
-rhs = 1;
+rhs = 3;
 
 %Parameters for the (vpara,vperp)-grid.
 vparamin=-4e6;
@@ -28,6 +28,7 @@ xtrue = biMaxx(vpara,vperp);
 %Forward model matrix A
 A = transferMatrix(vpara,vperp,phi,u);
 
+%%
 switch rhs
     case 1
         [b, e] = generate_noisy_b(A,xtrue);     %Basically b = A*x + noise 
@@ -52,9 +53,9 @@ end
 L = reguL(vpara,vperp);
 
 %A vector of alphas for finding the optimal regularization parameter.
-alphas0 = logspace(-9,-4,50);
-alphas1 = logspace(-4,4,50); 
-
+alphas0 = logspace(-15,-8,100);
+alphas1 = logspace(-4,4,100); 
+%%
 %Find the relative error for 0th order and 1st order.
 [~, ~, r0] = TikhNN(A, b, alphas0, [], 'return_relerr', true, 'x_true', xtrue);
 [~, ~, r1] = TikhNN(A, b, alphas1,  L, 'return_relerr', true, 'x_true', xtrue);
@@ -66,6 +67,27 @@ alphas1 = logspace(-4,4,50);
 %Find the corresponding solution.
 xopt0 = TikhNN(A,b,alpha0opt);
 xopt1 = TikhNN(A,b,alpha1opt,L);
+
+%%
+%Plot Tikhonov results
+figure
+subplot(2,2,1)
+semilogx(alphas0, r0); xlabel('\alpha','FontSize',15); ylabel('Relative error','FontSize',15); title('0th order Tikhonov')
+xlim([alphas0(1), alphas0(end)])
+hold on
+plot(alpha0opt, minr0, '.', 'MarkerSize', 15); 
+subplot(2,2,3)
+showDistribution(xopt0,ginfo); title('Optimal 0th order solution')
+
+subplot(2,2,2)
+semilogx(alphas1, r1); xlabel('\alpha','FontSize',15); ylabel('Relative error','FontSize',15); title('1st order Tikhonov')
+xlim([alphas1(1), alphas1(end)])
+hold on
+plot(alpha1opt, minr1, '.', 'MarkerSize', 15)
+subplot(2,2,4)
+showDistribution(xopt1,ginfo); title('Optimal 1st order solution')
+
+
 
 %%
 %Do the sampling.

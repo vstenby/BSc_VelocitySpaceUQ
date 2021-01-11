@@ -62,8 +62,8 @@ g=ne/((log(1+(vbirth/vcrit)^3))*4*vcrit)*(log(abs((vbirth^2-vcrit*vbirth+vcrit^2
     log(((abs(u)+vcrit)/(vbirth+vcrit)).^2)+2*sqrt(3)*(atan((2*vbirth-vcrit)/(sqrt(3)*vcrit))-atan((2*abs(u)-vcrit)/(sqrt(3)*vcrit)))).*erfc((0.5*Mi*u.^2/Qe-Ebirth)/Ebirthwidth)/2; 
 
 %Set the values where |u| > vb to zero, as Mirko suggested.
-g(abs(u)>vbirth) = 0;
-
+%g(abs(u)>vbirth) = 0;
+g = g.*heaviside(vbirth - abs(u));
 g = reshape(g, length(g), 1);
 
 if ~isempty(phi)

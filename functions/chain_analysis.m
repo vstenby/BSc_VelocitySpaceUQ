@@ -14,6 +14,6 @@ names{3}     = '\alpha';
 plot([1:nacf],acfun(1,:),'r',[1:nacf],acfun(2,:),'k--','LineWidth',2)
 axis([1,nacf,0,1])
 title('ACFs for \lambda and \delta.')
-legend(['\tau_{\rm int}(\lambda)=',num2str(taux(1))],['x_2: \tau_{\rm int}(\delta)=',num2str(taux(2))])
+legend(['\tau_{\rm int}(\lambda)=',num2str(taux(1))],['\delta: \tau_{\rm int}(\delta)=',num2str(taux(2))])
 
 end
