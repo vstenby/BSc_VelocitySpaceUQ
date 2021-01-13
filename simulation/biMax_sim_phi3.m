@@ -11,15 +11,14 @@ function biMax_sim_phi3(sim_idx)
     
     %Observation angles.
     phi  = [60 80];
-    phi3 = [5:5:90]; phi3 = [1 phi3];
+    phi3 = [15:5:30]; 
     phi(3) = phi3(sim_idx); clear phi3
     
-    nsim = 5000;
-    nburnin = 500;
+    nsim = 11000;
   
     % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     
-    rhs = 2;
+    rhs = 3;
     
     %Parameters for the (vpara,vperp)-grid.
     vparamin=-4e6;
@@ -58,41 +57,41 @@ function biMax_sim_phi3(sim_idx)
     [A, b] = error_normalization(A,b,e);    
 
     %Regularization matrix L (1st order Tikhonov)
-    L = reguL(vperpdim, vparadim);
+    L = reguL(vpara, vperp);
 
     %A vector of alphas for finding the optimal regularization parameter.
-    alpha_relerr = logspace(-9,-4,100);
+    alpha_relerr = logspace(-10,10,500);
 
     %Find the relative error for 0th order and 1st order.
-    [~, ~, r0th] = TikhNN(A, b, alpha_relerr, [], 'return_relerr', true, 'x_true', xtrue);
+    %[~, ~, r0th] = TikhNN(A, b, alpha_relerr, [], 'return_relerr', true, 'x_true', xtrue);
     [~, ~, r1st] = TikhNN(A, b, alpha_relerr,  L, 'return_relerr', true, 'x_true', xtrue);
 
     %Find the alpha with the smallest relative error.
-    [minr0,idx0] = min(r0th); optalpha_0th = alpha_relerr(idx0);
+    %[minr0,idx0] = min(r0th); optalpha_0th = alpha_relerr(idx0);
     [minr1,idx1] = min(r1st); optalpha_1st = alpha_relerr(idx1);
 
     %Find the corresponding solution.
-    xopt0 = TikhNN(A,b,optalpha_0th);
+    %xopt0 = TikhNN(A,b,optalpha_0th);
     xopt1 = TikhNN(A,b,optalpha_1st,L);
 
     %Do the sampling.
-    [xNNHGS0, alphasim0, deltasim0, lambdasim0, NNHGS0info] = NNHGS(A,b,[],nsim,'solver', 'lsqnonneg', 'welford',true,'nburnin',nburnin);
-    [xNNHGS1, alphasim1, deltasim1, lambdasim1, NNHGS1info] = NNHGS(A,b,L,nsim,'solver','lsqnonneg','welford',true,'nburnin',nburnin);
+    %[xNNHGS0, alphasim0, deltasim0, lambdasim0, NNHGS0info] = NNHGS(A,b,[],nsim,'solver', 'lsqnonneg', 'welford',true,'nburnin',nburnin);
+    [xNNHGS1, alphasim1, deltasim1, lambdasim1, NNHGS1info] = NNHGS(A,b,L,nsim);
 
     %Calculate reconstruction with mean(alpha)
-    xsamplealpha0 = TikhNN(A,b,mean(alphasim0));
+    %xsamplealpha0 = TikhNN(A,b,mean(alphasim0));
     xsamplealpha1 = TikhNN(A,b,mean(alphasim1),L);
 
     %Empiric confidence intervals for alpha.
-    CIalpha0 = quantile(alphasim0,[0.025, 0.975]);
-    CIalpha1 = quantile(alphasim1,[0.025, 0.975]);
+    %CIalpha0 = quantile(alphasim0,[0.025, 0.975]);
+    qalpha1 = quantile(alphasim1,[0.025, 0.975]);
 
     %Calculate the caxis for all solutions and standard deviation of solution.
-    caxis_mu  = [min([xtrue(:) ; xNNHGS0(:,1) ; xNNHGS1(:,1)]), ...
-                 max([xtrue(:) ; xNNHGS0(:,1) ; xNNHGS1(:,1)])];
+    %caxis_mu  = [min([xtrue(:) ; xNNHGS0(:,1) ; xNNHGS1(:,1)]), ...
+    %             max([xtrue(:) ; xNNHGS0(:,1) ; xNNHGS1(:,1)])];
 
-    caxis_std = [min([xNNHGS0(:,2) ; xNNHGS1(:,2)]), ...
-                 max([xNNHGS0(:,2) ; xNNHGS1(:,2)])];
+    %caxis_std = [min([xNNHGS0(:,2) ; xNNHGS1(:,2)]), ...
+    %             max([xNNHGS0(:,2) ; xNNHGS1(:,2)])];
              
     outputpath = sprintf('./biMax_sim_phi3/phi3_60_80_%02d.mat',phi(3));
     save(outputpath)

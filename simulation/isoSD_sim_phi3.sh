@@ -1,13 +1,13 @@
 #!/bin/sh
 # embedded options to bsub - start with #BSUB
 ### -- set the job Name AND the job array --
-#BSUB -J isoSD_sim_phi3[1-19]
+#BSUB -J isoSD_sim_phi3[1-14]
 ### -- specify queue --
 #BSUB -q hpc
 ### -- ask for number of cores (default: 1) --
-#BSUB -n 4
+#BSUB -n 1
 ### -- set walltime limit: hh:mm --
-#BSUB -W 08:00
+#BSUB -W 03:00
 ### -- specify that we need 2GB of memory per core/slot --
 #BSUB -R "rusage[mem=2GB]"
 ### -- set the email address --

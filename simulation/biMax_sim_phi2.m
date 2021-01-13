@@ -10,12 +10,13 @@ function biMax_sim_phi2(sim_idx)
     % with 10 degrees increments.
     
     %Observation angles.
-    phis = combvec(10:10:80, 10:10:80)';
+    %phis = combvec(10:10:80, 10:10:80)';
+    phis = [10 50 ; 50 80 ; 20 50 ; 30 80 ; 10 30 ; 60 80];
     phi = phis(sim_idx, :);
     clear phis
     
-    nsim = 5000;
-    nburnin = 500;
+    nsim = 5500;
+    %nburnin = 500;
   
     % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     
@@ -77,8 +78,8 @@ function biMax_sim_phi2(sim_idx)
     xopt1 = TikhNN(A,b,optalpha_1st,L);
 
     %Do the sampling.
-    [xNNHGS0, alphasim0, deltasim0, lambdasim0, NNHGS0info] = NNHGS(A,b,[],nsim,'solver', 'lsqnonneg', 'welford',true,'nburnin',nburnin);
-    [xNNHGS1, alphasim1, deltasim1, lambdasim1, NNHGS1info] = NNHGS(A,b,L,nsim,'solver','lsqnonneg','welford',true,'nburnin',nburnin);
+    [xNNHGS0, alphasim0, deltasim0, lambdasim0, NNHGS0info] = NNHGS(A,b,[],nsim);
+    [xNNHGS1, alphasim1, deltasim1, lambdasim1, NNHGS1info] = NNHGS(A,b,L,nsim);
 
     %Calculate reconstruction with mean(alpha)
     xsamplealpha0 = TikhNN(A,b,mean(alphasim0));
@@ -95,6 +96,6 @@ function biMax_sim_phi2(sim_idx)
     caxis_std = [min([xNNHGS0(:,2) ; xNNHGS1(:,2)]), ...
                  max([xNNHGS0(:,2) ; xNNHGS1(:,2)])];
              
-    outputpath = sprintf('./biMax_sim_phi2/phi2_%02d_%02d.mat',phi(1),phi(2));
+    outputpath = sprintf('./biMax_sim_phi2/phi2_%02d_%02d_full.mat',phi(1),phi(2));
     save(outputpath)
 end

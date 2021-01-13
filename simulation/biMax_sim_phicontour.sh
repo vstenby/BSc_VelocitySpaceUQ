@@ -1,7 +1,7 @@
 #!/bin/sh
 # embedded options to bsub - start with #BSUB
 ### -- set the job Name AND the job array --
-#BSUB -J biMax_sim_phicontour[1-10100]
+#BSUB -J biMax_sim_phicontour[1-5000]
 ### -- specify queue --
 #BSUB -q hpc
 ### -- ask for number of cores (default: 1) --

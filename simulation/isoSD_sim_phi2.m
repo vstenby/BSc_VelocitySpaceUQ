@@ -10,12 +10,11 @@ function isoSD_sim_phi3(sim_idx)
     % and the last one is in the range 1 to 90.
     
     %Observation angles.
-    phi  = [60 80];
-    phi3 = [15:2.5:30];
-    phi(3) = phi3(sim_idx); clear phi3
+    phis = [10 50 ; 60 80];
+    phi = phis(sim_idx,:); clear phis
     
-    nsim = 10000;
-    nburnin = 1000;
+    nsim = 5500;
+    %nburnin = 500;
     
     % - - - - - - - - - - Simulation setup  - - - - - - - - - - - - - - - -
     
@@ -61,7 +60,7 @@ function isoSD_sim_phi3(sim_idx)
     L = reguL(vpara, vperp);
 
     %A vector of alphas for finding the optimal regularization parameter.
-    alpha_relerr = logspace(-15,15,500);
+    alpha_relerr = logspace(-30,30,500);
 
     %Find the relative error for 0th order and 1st order.
     [~, ~, r0th] = TikhNN(A, b, alpha_relerr, [], 'return_relerr', true, 'x_true', xtrue);
@@ -76,16 +75,16 @@ function isoSD_sim_phi3(sim_idx)
     xopt1 = TikhNN(A,b,optalpha_1st,L);
 
     %Do the sampling.
-    [xNNHGS0, alphasim0, deltasim0, lambdasim0, NNHGS0info] = NNHGS(A,b,[],nsim,'welfordsalgorithm',true,'nburnin',nburnin);
-    [xNNHGS1, alphasim1, deltasim1, lambdasim1, NNHGS1info] = NNHGS(A,b,L,nsim,'welfordsalgorithm',true,'nburnin',nburnin);
+    [xNNHGS0, alphasim0, deltasim0, lambdasim0, NNHGS0info] = NNHGS(A,b,[],nsim);
+    [xNNHGS1, alphasim1, deltasim1, lambdasim1, NNHGS1info] = NNHGS(A,b,L,nsim);
 
     %Calculate reconstruction with mean(alpha)
     xsamplealpha0 = TikhNN(A,b,mean(alphasim0));
     xsamplealpha1 = TikhNN(A,b,mean(alphasim1),L);
 
     %Empiric confidence intervals for alpha.
-    qalpha0 = quantile(alphasim0,[0.025, 0.975]);
-    qalpha1 = quantile(alphasim1,[0.025, 0.975]);
+    CIalpha0 = quantile(alphasim0,[0.025, 0.975]);
+    CIalpha1 = quantile(alphasim1,[0.025, 0.975]);
 
     %Calculate the caxis for all solutions and standard deviation of solution.
     caxis_mu  = [min([xtrue(:) ; xNNHGS0(:,1) ; xNNHGS1(:,1)]), ...
@@ -94,6 +93,6 @@ function isoSD_sim_phi3(sim_idx)
     caxis_std = [min([xNNHGS0(:,2) ; xNNHGS1(:,2)]), ...
                  max([xNNHGS0(:,2) ; xNNHGS1(:,2)])];
 
-    outputpath = sprintf('./isoSD_sim_phi3_15_to_30/phi3_%02d.mat',sim_idx);
+    outputpath = sprintf('./isoSD_sim_phi2/phi2_%02d_%02d.mat',phi(1),phi(2));
     save(outputpath)                
 end

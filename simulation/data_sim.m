@@ -16,7 +16,7 @@ sims = combvec(1:7, 1:4);
 sim = sims(:,sim_idx); ts = sim(1); rhs = sim(2);
 
 loadfile = sprintf('./data/ts%d.mat',ts);
-outfile = sprintf('./data_sim/ts_%02d_rhs_%02d.mat',ts,rhs);
+outfile = sprintf('./data_sim2/ts_%02d_rhs_%02d.mat',ts,rhs);
 
 switch rhs
     case 1
@@ -61,10 +61,10 @@ alpha = logspace(-6,5,200);
 % -- End of Tikhonov --
 
 nsim = 5000;
-nburnin = 500;
+%nburnin = 500;
 
 % -- Nonnegative Gibbs Sampler --
-[xsim, alphasim, deltasim, lambdasim, info] = NNHGS(A, b, L, nsim, 'welfordsalgorithm', true, 'nburnin', nburnin);
+[xsim, alphasim, deltasim, lambdasim, info] = NNHGS(A, b, L, nsim);
 
 save(outfile)
 end
