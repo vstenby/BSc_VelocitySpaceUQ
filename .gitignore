@@ -1,3 +1,4 @@
+*.tex
 !sim0th.mat
 _build
 .DS_Store
@@ -19,4 +20,4 @@ other/shot65897.zip
 other/realdata_recon.fig
 thesis
 *.pdf
-other/*
+other/

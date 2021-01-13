@@ -1,4 +1,11 @@
 function[b, e] = add_noise(b0,noise_level,background_level)
+% Usage:
+%   b = add_noise(b0)
+%   [b,e] = add_noise(b0, noise_level, background_level)
+%
+% This function adds noise to the right hand side. The default noise level
+% is 0.01. The noise generated noise is based on some earlier code by
+% Asger Schou Jacobsen, December 2014.
 
 if nargin == 1
     noise_level = 0.01;
