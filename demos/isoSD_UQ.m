@@ -36,8 +36,13 @@ disp('Running Gibbs Sampler with 0th order prior - this might take a while.')
 disp('Running Gibbs Sampler with 1st order prior - this might take a while.')
 [xsim1, alphasim1, deltasim1, lambdasim1, info1] = NNHGS(A,b,L,nsim);
 
-fprintf('0th order prior, geweke p: %.05f\n',geweketest([alphasim0 deltasim0 lambdasim0],nburnin))
-fprintf('0th order prior, geweke p: %.05f\n',geweketest([alphasim1 deltasim1 lambdasim1],nburnin))
+%Convergence plots for 0th order
+disp('0th order:')
+chain_analysis(deltasim0(nburnin:end),lambdasim0(nburnin:end))
+
+%Convergence plots for 1st order
+disp('1st order:')
+chain_analysis(deltasim1(nburnin:end),lambdasim1(nburnin:end))
 
 %Plot the regularisation parameters with sample quantiles
 %0th order
@@ -54,7 +59,6 @@ errorbar(alpha0_mean, r0mean, ...
          'horizontal','LineWidth',1,'color','r', 'HandleVisibility', 'off')
 title('0th order regularisation parameter results')
 
-
 figure
 semilogx(alpha1, ralpha1)
 hold on
@@ -68,14 +72,12 @@ errorbar(alpha1_mean, r1mean, ...
          'horizontal','LineWidth',1,'color','r', 'HandleVisibility', 'off')
 title('1st order regularisation parameter results')
 
-
 %Plot the credibility bounds
 figure
 subplot(1,2,1)
 showDistribution(mean(xsim0(:,nburnin:end),2),ginfo); title('Sample mean, 0th order prior')
 subplot(1,2,2)
 showDistribution(cbounds(xsim0(:,nburnin:end)),ginfo); title('95% credibility bounds, 0th order prior')
-
 
 figure
 subplot(1,2,1)

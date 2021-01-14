@@ -30,5 +30,9 @@ else
     error('Wrong display input')
 end
 caxis([-max(abs(dif)), max(abs(dif))])
-colormap(brewermap([],'*RdBu'))
+try
+    colormap(brewermap([],'*RdBu'))
+catch
+    error('brewermap not installed.')
+end
 end

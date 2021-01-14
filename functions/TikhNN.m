@@ -128,16 +128,6 @@ x = zeros(N,nalpha);
 
 % -- Main loop --
 switch solver
-    %case 'GPCG'
-    %    LtL = L'*L; %Precompute LtL for speed.
-    %    x0 = zeros(N,1); 
-    %    for i=1:nalpha
-    %        B   = @(x) (A'*(A*x)) + alpha(i)*LtL*x; 
-    %        rhs = A'*b;
-    %        x(:,i) = GPCG(B, rhs, x0, 50);
-    %        %x(:,i) = GPCG(B, rhs, x0, 50, 5, 20, 1e-6);
-    %        if dispwaitbar, waitbar(i/nalpha, f, 'Solving...'), end
-    %    end
     case 'lsqnonneg'
         for i=1:nalpha
             C = [A ; sqrt(alpha(i))*L];
