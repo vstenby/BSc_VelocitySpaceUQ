@@ -12,7 +12,7 @@ Bi-Maxwellian Distribution
 Isotropic Slowing-Down Distribution
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. mat:autofunction functions.isoSDx
+.. mat:autofunction functions.biMaxx
 
 Analytic Velocity Distributions
 -------------------------------

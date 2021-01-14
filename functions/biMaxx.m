@@ -18,7 +18,7 @@ function [x, info] = biMaxx(vpara, vperp, varargin)
 %   
 %    * **Tperp**:               Perpendicular ion temperature. Default : ``20 keV``
 %   
-%    * **vparadrift**:          Parallel-drift velovity. Default : ``5e5 m/s``
+%    * **vparadrift**:          Parallel-drift velocity. Default : ``5e5 m/s``
 %
 %    * **Mi**:                  Mass of ion. Default : ``2*Mp``
 %
