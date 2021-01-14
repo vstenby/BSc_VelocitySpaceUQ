@@ -1,5 +1,6 @@
 function [x, info] = biMaxx(vpara, vperp, varargin)
-% Evaluates the bi-Maxwellian distribution on a (vpara,vperp)-grid.
+% Evaluates the bi-Maxwellian fast-ion velocity
+% distribution on a (vpara,vperp)-grid.
 %
 % Usage: 
 %    ``x = biMaxx(vpara,vperp)``
@@ -13,13 +14,13 @@ function [x, info] = biMaxx(vpara, vperp, varargin)
 %
 %
 % Optional inputs:
-%    * **Tpara**:               Needs an explanation. Default : ``20 keV``
+%    * **Tpara**:               Parallel ion temperature.      Default : ``20 keV``
 %   
-%    * **Tperp**:               Needs an explanation. Default : ``20 keV``
+%    * **Tperp**:               Perpendicular ion temperature. Default : ``20 keV``
 %   
-%    * **vparadrift**:          Needs an explanation. Default : ``5e5``
+%    * **vparadrift**:          Parallel-drift velovity. Default : ``5e5 m/s``
 %
-%    * **Mi**:                  Needs an explanation. Default : ``2*Mp``
+%    * **Mi**:                  Mass of ion. Default : ``2*Mp``
 %
 %    * **ne**:                  Number of ions. Default : ``1e19``
 %
