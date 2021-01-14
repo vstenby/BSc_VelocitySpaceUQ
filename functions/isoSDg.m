@@ -1,6 +1,6 @@
 function [g, info] = isoSDg(u,phi,varargin)
-% Evaluates the velocity distribution of the isotropic slowing down
-% distribution for given u and phi.
+% Evaluates the analytic projected velocity distribution of the
+% slowing down fast-ion velocity distribution.
 %
 % Usage: 
 %    ``g = isoSDg(u)``
@@ -10,23 +10,23 @@ function [g, info] = isoSDg(u,phi,varargin)
 %    ``[g, info] = isoSDg(u,phi,varargin)``
 %
 % Inputs:
-%    * **u**:               Write a description here.
+%    * **u**:               Vector of projected velocities.
 %
 %    * **phi**:             Observation angles.
 %
 % Optional inputs:
-%    * **Ecrit**:           Needs an explanation. Default : ``44*20000 eV``
+%    * **Ecrit**:               Critical energy. Default : ``44*20000 eV``
 %   
-%    * **Ebirth**:          Needs an explanation. Default : ``3.5e6 eV``
+%    * **Ebirth**:              Birth energy. Default : ``3.5e6 eV``
 %   
-%    * **Ebirthwidth**:     Needs an explanation. Default : ``6e4``
+%    * **Ebirthwidth**:         Birth energy width. Default : ``6e4``
 %
-%    * **Mi**:              Needs an explanation. Default : ``4*Mp``
+%    * **Mi**:                  Mass of ions. Default : ``4*Mp``
 %
-%    * **ne**:              Number of ions. Default : ``1e19``
+%    * **ne**:                  Number of ions. Default : ``1e19``
 %
 % Output:
-%    * **g**:               Velocity distribution
+%    * **g**:               Projected velocity distribution.
 %
 %    * **info**:            MATLAB struct containing all inputs (including optional inputs) above.
 
@@ -49,7 +49,7 @@ Mi = 4*Mp;
 ne = 1e19; 
 
 %Unpack the varargin and evaluate.
-validvars = {'return_relerr','scaling','solver','x_true'};
+validvars = {'Ecrit','Ebirth','Ebirthwidth','Mi','ne'};
 evals = varargin_to_eval(varargin,validvars);
 for i=1:length(evals); eval(evals{i}); end
 % - - - - - - - - - - -  Optional inputs - - - - - - - - - - - 
@@ -61,8 +61,7 @@ vbirth=sqrt(2*Ebirth*Qe/Mi);
 g=ne/((log(1+(vbirth/vcrit)^3))*4*vcrit)*(log(abs((vbirth^2-vcrit*vbirth+vcrit^2)./(u.^2-vcrit*abs(u)+vcrit^2)))+...
     log(((abs(u)+vcrit)/(vbirth+vcrit)).^2)+2*sqrt(3)*(atan((2*vbirth-vcrit)/(sqrt(3)*vcrit))-atan((2*abs(u)-vcrit)/(sqrt(3)*vcrit)))).*erfc((0.5*Mi*u.^2/Qe-Ebirth)/Ebirthwidth)/2; 
 
-%Set the values where |u| > vb to zero, as Mirko suggested.
-%g(abs(u)>vbirth) = 0;
+%Apply the heaviside function.
 g = g.*heaviside(vbirth - abs(u));
 g = reshape(g, length(g), 1);
 

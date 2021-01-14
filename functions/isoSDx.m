@@ -13,13 +13,13 @@ function [x, info] = isoSDx(vpara, vperp, varargin)
 %
 %
 % Optional inputs:
-%    * **Ecrit**:               Needs an explanation. Default : ``44*20000 eV``
+%    * **Ecrit**:               Critical energy. Default : ``44*20000 eV``
 %   
-%    * **Ebirth**:              Needs an explanation. Default : ``3.5e6 eV``
+%    * **Ebirth**:              Birth energy. Default : ``3.5e6 eV``
 %   
-%    * **Ebirthwidth**:         Needs an explanation. Default : ``6e4``
+%    * **Ebirthwidth**:         Birth energy width. Default : ``6e4``
 %
-%    * **Mi**:                  Needs an explanation. Default : ``4*Mp``
+%    * **Mi**:                  Mass of ions. Default : ``4*Mp``
 %
 %    * **ne**:                  Number of ions. Default : ``1e19``
 %
@@ -49,7 +49,6 @@ for i=1:length(evals); eval(evals{i}); end
 vcrit=sqrt(2*Ecrit*Qe/Mi);
 vbirth=sqrt(2*Ebirth*Qe/Mi);
 
-%fvpavpe3DSD=ne*3/(4*pi)/(log(1+(vbirth/vcrit)^3))./((vpara.^2+vperp.^2).^1.5+vcrit^3).*erfc((0.5*Mi*(vpara.^2+vperp.^2)/Qe-Ebirth)/Ebirthwidth)/2;
 fvpavpe3DSD = ne*3/(4*pi*log(1+(vbirth/vcrit)^3)).*heaviside(vbirth - sqrt(vpara.^2 + vperp.^2))./((vpara.^2+vperp.^2).^1.5 + vcrit^3);
 
 x = fvpavpe3DSD.*(2*pi*vperp);

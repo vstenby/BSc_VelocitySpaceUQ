@@ -1,31 +1,32 @@
 function [g, info] = biMaxg(u,phi,varargin)
-% Fix this documentation.
+% Evaluates the analytic projected velocity distribution of the
+% bi-Maxwellian velocity distribution.
 %
 % Usage: 
-%    ``g = isoSDg(u)``
+%    ``g = biMaxg(u)``
 %
-%    ``g = isoSDg(u,phi)``
+%    ``g = biMaxg(u,phi)``
 %
-%    ``[g, info] = isoSDg(u,phi,varargin)``
+%    ``[g, info] = biMaxg(u,phi,varargin)``
 %
 % Inputs:
-%    * **u**:               Write a description here.
+%    * **u**:               Vector of projected velocities.
 %
 %    * **phi**:             Observation angles.
 %
 % Optional inputs:
-%    * **Ecrit**:           Needs an explanation. Default : ``44*20000 eV``
+%    * **Tpara**:           Parallel ion temperature. Default : ``20 keV``
 %   
-%    * **Ebirth**:          Needs an explanation. Default : ``3.5e6 eV``
+%    * **Tperp**:           Perpendicular ion temperature. Default : ``20 keV``
 %   
-%    * **Ebirthwidth**:     Needs an explanation. Default : ``6e4``
+%    * **vparadrift**:      Parallel-drift velocity. Default : ``5e5``
 %
-%    * **Mi**:              Needs an explanation. Default : ``4*Mp``
+%    * **Mi**:              Mass of ion. Default : ``2*Mp``
 %
 %    * **ne**:              Number of ions. Default : ``1e19``
 %
 % Output:
-%    * **g**:               Velocity distribution
+%    * **g**:               Analytic projected velocity distribution.
 %
 %    * **info**:            MATLAB struct containing all inputs (including optional inputs) above.
 
@@ -35,8 +36,8 @@ Qe = 1.6021917e-19; %Elementary charge
 
 % - - - - - - - - - - -  Optional inputs - - - - - - - - - - - 
 %Set default values for optional inputs.
-Tpara = 20; %eV
-Tperp = 20; %eV
+Tpara = 20; %keV
+Tperp = 20; %keV
 vparadrift = 5e5;
 Mi = 2*Mp;
 ne = 1e19;
@@ -73,5 +74,4 @@ info.Tperp = Tperp;
 info.vparadrift = vparadrift;
 info.Mi = Mi;
 info.ne = ne;
-
 end
