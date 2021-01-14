@@ -12,6 +12,8 @@ Bi-Maxwellian Distribution
 Isotropic Slowing-Down Distribution
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Hello, this is a test to check if it is even working.
+
 .. mat:autofunction functions.biMaxx
 
 Analytic Velocity Distributions
