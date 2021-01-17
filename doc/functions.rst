@@ -51,7 +51,6 @@ Nonnegative Hierachical Gibbs Sampler
 
 .. mat:autofunction:: functions.NNHGS
 
-
 Auxilary functions
 ------------------
 
