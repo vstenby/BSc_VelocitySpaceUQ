@@ -3,8 +3,8 @@ Examples
 
 Here, we can see the examples.
 
-.. code-block:: MATLAB
+.. code-block:: Matlab
 
-for i=1:5
-	disp(i)
-end
+   for i=1:5
+     disp(i)
+   end
