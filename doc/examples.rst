@@ -1,7 +1,11 @@
 Examples
 ========
 
-Here, we can see the examples.
+Tikhonov Reconstructions
+------------------------
+
+Bi-Maxwellian 
+^^^^^^^^^^^^^
 
 .. code-block:: Matlab
 
@@ -53,3 +57,8 @@ Here, we can see the examples.
 
    figure
    showDistribution(xalpha1(:,idx1),ginfo); title('Optimal 1st order Tikhonov solution')
+
+Slowing-down Distribution
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Here, we should have the slowing down distribution example.
