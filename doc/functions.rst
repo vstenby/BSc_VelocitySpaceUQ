@@ -9,6 +9,7 @@ Bi-Maxwellian Distribution
 
 .. mat:autofunction:: functions.biMaxx
 
+
 Isotropic Slowing-Down Distribution
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -59,3 +60,7 @@ Auxilary functions
 .. mat:autofunction:: functions.construct_uvec
 
 .. mat:autofunction:: functions.reguL
+
+.. mat:autofunction:: functions.showDistribution
+
+.. mat:autofunction:: functions.generate_noisy_b

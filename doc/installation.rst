@@ -21,26 +21,45 @@ The MATLAB Toolbox works with MATLAB's built-in optimizers, but it can take some
 Therefore it is suggested that mosek is installed. For how to install mosek, you can find the guide 
 `here. <https://docs.mosek.com/9.2/install/installation.html/>`_
 
-Folder structure
-----------------
+Folder structure and other dependencies
+---------------------------------------
 
 The structure of the folder should be as follows:
 
 .. code-block:: bash
-   
+
   .
   ├── BSc_VelocitySpaceUQ
   │   ├── LICENSE
   │   ├── README.md
+  │   ├── data
   │   ├── demos
   │   ├── doc
   │   ├── functions
-  │   ├── images
+  │   ├── images 
   │   ├── other
   │   ├── simulation
   │   └── testprobs
   └── aux
-      └── mosek
+      ├── DrosteEffect-BrewerMap-ca40391
+      ├── mosek
+      └── table2latex.m
 
-Remember to add the functions and mosek folder to your MATLAB path before running the code.
-Certain functions will give warnings if mosek is not loaded.
+
+Remember to add the ``functions`` folder, ``testprobs`` folder and ``mosek`` folder to your path. Running the following code:
+
+.. code-block:: Matlab
+
+   %Returns 1 if mosek is properly installed, 0 otherwise.
+   check_mosek()
+    
+   %Checks if the bi-Maxwellian testprob is added to path.
+   [A, b, x, L] = biMax()
+
+   %Checks if functions is added to path.
+   TikhNN(A,b,0,[])
+
+
+should check most functions. DrosteEffect-Brewermap is required for the colorscheme for the function ``UQmap``. The repository can be 
+downloaded from its GitHub repository `here <https://github.com/DrosteEffect/BrewerMap>`_. ``table2latex.m`` is a MATLAB function used
+for generating LaTeX-tables from MATLAB's tables. It can be found at the MATLAB File Exchange `at this link  <https://www.mathworks.com/matlabcentral/fileexchange/80386-table2latex>`_.
