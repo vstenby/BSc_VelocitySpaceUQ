@@ -13,24 +13,20 @@ function [vpara, vperp, ginfo] = construct_vgrid(vparadim, vperpdim, varargin)
 %    * **vperpdim**:        The dimensions in the perpendicular dimension.
 %
 % Optional inputs:
-%    * **vparamin**:        Write description here.
+%    * **vparamin**:        Minimum parallel velocity.
 %
-%    * **vparamax**:        Write description here. 
+%    * **vparamax**:        Maximum parallel velocity. 
 %
-%    * **vparadim**:        Write description here.
+%    * **vperpmin**:        Minimum perpendicular velocity.
 %
-%    * **vperpmin**:        Write description here
-%
-%    * **vperpmax**:        Write description here.
-%
-%    * **vperpdim**:        Write description here.
+%    * **vperpmax**:        Maximum perpendicular velocity.
 %
 % Output:
-%    * **vpara**:           Write description here.
+%    * **vpara**:           A vpara-grid.
 %
-%    * **vperp**:            Write description here.
+%    * **vperp**:           A vperp-grid.
 %
-%    * **ginfo**:            Write description here.
+%    * **ginfo**:           Information about the grid, used for plotting.
 
 
 switch nargin

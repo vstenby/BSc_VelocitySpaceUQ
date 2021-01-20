@@ -7,20 +7,20 @@ function u = construct_uvec(varargin)
 %    ``u = construct_uvec(varargin)`` 
 %
 % Optional inputs:
-%    * **Emin**:        Write description here.
+%    * **Emin**:        Minimum projected energy.
 %
-%    * **Emax**:        Write description here.
+%    * **Emax**:        Maximum projected energy.
 %
-%    * **umin**:        Write description here. 
+%    * **umin**:        Minimum projected velocity u. 
 %
-%    * **umin**:        Write description here. 
+%    * **umax**:        Maximum projected velocity u. 
 %
-%    * **du**:          Write description here.
+%    * **du**:          Difference between elements in the vector.
 %
-%    * **udim**:        Write description here.
+%    * **udim**:        Dimension of the output vector.
 %
 % Output:
-%    * **u**:           Write some description here.
+%    * **u**:           u-vector.
 
 Qe = 1.6021917e-19; %Elementary charge
 Mp = 1.6726e-27;    %Mass of proton
