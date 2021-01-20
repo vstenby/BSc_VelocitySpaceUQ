@@ -4,13 +4,13 @@ function L = reguL(varargin)
 %
 % Usage: 
 %    ``L = reguL(vpara, vperp)`` 
-%
+%    
 % Inputs:
-%    * **A**:                   TODO: Fix this documentation.
+%    * **vpara**:               vpara-grid                  
+%    * **vperp**:               vperp-grid
 %
 % Output:
 %    * **L**:               	The regularization matrix L.
-
 
 switch nargin
     case 1

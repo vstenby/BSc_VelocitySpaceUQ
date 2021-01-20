@@ -1,5 +1,12 @@
 function val = check_mosek()
-% Calls the mosekdiag but silently.
+% A wrapper for mosekdiag, checking if mosek works correctly.
+%
+% Usage: 
+%    ``check_mosek()``
+%
+% Output: 
+%    ``1`` if working correctly, ``0`` otherwise.
+%
 try
     str = evalc('mosekdiag');
     if contains(str, 'mosekopt works OK.') || contains(str, 'mosekopt is working correctly')

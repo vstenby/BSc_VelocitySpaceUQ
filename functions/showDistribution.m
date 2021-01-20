@@ -1,5 +1,17 @@
 function showDistribution(X, gridinfo, caxis_limits)
-%Show the distribution in X
+% Displays a fast-ion velocity distribution.
+%
+% Usage: 
+%    ``showDistribution(X, ginfo)`` 
+%
+%    ``showDistribution(X, ginfo, caxis_limits)``
+%
+% Inputs:
+%    * **X**:                      Velocity distribution X as a vector.
+%
+%    * **gridinfo**:               gridinfo structure.
+%
+%    * **caxis_limits**:           Color-axis limits.
 
 %Set caxis if not specified.
 if nargin <= 2, caxis_limits = [min(X(:)), max(X(:))]; end

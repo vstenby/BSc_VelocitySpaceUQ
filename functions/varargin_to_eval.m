@@ -1,5 +1,4 @@
 function evals = varargin_to_eval(input,validvars)
-
 %If valid vares are passed, then we should check whether or not
 %each variable is valid.
 

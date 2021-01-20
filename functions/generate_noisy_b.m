@@ -17,9 +17,9 @@ function [b, e] = generate_noisy_b(A, x, varargin)
 %    * **background_level**: Background level for the noise.
 %
 % Output:
-%    * **b**:                Write some description here.
+%    * **b**:                Noisy right hand side.
 %
-%    * **e**:                Write some description here.
+%    * **e**:                Noise used for normalization.
 
 x = x(:);
 

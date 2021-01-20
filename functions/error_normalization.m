@@ -1,7 +1,17 @@
 function [A_norm, b_norm] = error_normalization(A,b,e)
-% This function normalises with the error by diving each element in b
-% and each row in A with the 1/e.
-% Normalizes with e as done in AnalyticTestCase.m
+% Divides each row in A by the corresponding element in e
+% and divides b elementwise with e. Physics stuff.
+%
+% Usage: 
+%    ``[A_norm, b_norm] = error_normalization(A, b, e)``
+%
+%
+% Inputs:
+%    * **xsamp**:               An N x n matrix, where each column is a sample.
+%
+%
+% Output:
+%    * **c**:                   The width of the credibility bounds.
 
 %This could be done quicker.
 A_norm = zeros(size(A));

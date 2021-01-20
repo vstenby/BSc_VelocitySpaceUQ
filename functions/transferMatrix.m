@@ -5,13 +5,13 @@ function A = transferMatrix(vpara, vperp, phi, u)
 %    ``A = transferMatrix(vpara, vperp, phi, u)`` 
 %
 % Inputs:
-%    * **vpara**:                   Add description.
+%    * **vpara**:                   vpara-grid.
 %
-%    * **vperp**:                   Add description.
+%    * **vperp**:                   vperp-grid.
 %
-%    * **phi**:                     Add description.
+%    * **phi**:                     Vector of observation angles.
 %
-%    * **u**:                       Add description.
+%    * **u**:                       Vector of projected velocity values.
 %
 % Output:
 %    * **A**:               	    The forward model matrix A.

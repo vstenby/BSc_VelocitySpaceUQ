@@ -1,4 +1,6 @@
 function [A, b, L, scaling] = norm_normalization(A, b, L)
+%norm_normalization implements the normalization used in Birgitte's 
+%Thesis. It is used for the real-data regularisation cases.
 
 if isstruct(L)
     % Fetch from L struct
@@ -27,4 +29,5 @@ else
     L = L/norm_L * norm(A);
     scaling = 1/norm_A;
 end
+
 end

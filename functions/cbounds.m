@@ -1,19 +1,20 @@
 function c = cbounds(xsamp)
-% Calculates the width of the credibility bounds for 
-% a matrix of samples.
+% Calculates the width of 95% credibility bounds. 
 %
-% Usage:
-%	c = cbounds(x)
-% Input:
+% Usage: 
+%    ``c = cbounds(xsamp)``
 %
-% x: Matrix of size (N x n),
-% where N is the dimension of x, and 
-% n is the number of samples. 
+%
+% Inputs:
+%    * **xsamp**:               An N x n matrix, where each column is a sample.
+%
+%
+% Output:
+%    * **c**:                   The width of the credibility bounds.
 
 
 % npixel x nsamps matrix
 qlower = quantile(xsamp,0.05/2,2);
 qupper = quantile(xsamp,1-(0.05/2),2);
 c = qupper - qlower;
-
 end

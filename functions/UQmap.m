@@ -1,5 +1,4 @@
 function UQmap(xcompare, xbaseline, ginfo, varargin)
-
 %Set default parameters
 cbound = true;
 display = 'showDistribution';
