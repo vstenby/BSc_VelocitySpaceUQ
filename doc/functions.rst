@@ -64,3 +64,9 @@ Auxilary functions
 .. mat:autofunction:: functions.showDistribution
 
 .. mat:autofunction:: functions.generate_noisy_b
+
+.. mat:autofunction:: functions.cbounds
+
+.. mat:autofunction:: functions.check_mosek
+
+.. mat:autofunction:: functions.geweketest
